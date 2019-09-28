@@ -1,14 +1,6 @@
 <template>
   <div class="layout">
     <slot/>
-    <div class="footer">
-      <p>
-        Built with
-        <a class="link" href="//gridsome.org">Gridsome</a>
-        & Made with ❤️ by
-        <a class="link" href="//twitter.com/lauragift21">Gift Egwuenu</a>
-      </p>
-    </div>
   </div>
 </template>
 
@@ -24,7 +16,7 @@ body {
 }
 
 .layout {
-  max-width: 760px;
+  max-width: max-content;
   margin: 0 auto;
   padding-left: 20px;
   padding-right: 20px;
