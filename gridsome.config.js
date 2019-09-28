@@ -5,15 +5,15 @@
 // To restart press CTRL + C in terminal and run `gridsome develop`
 
 module.exports = {
-  siteName: 'Gridsome Blog',
-  siteDescription: 'A simple blog designed with Gridsome',
+  siteName: 'Abdulazeez Abdulazeez',
+  siteDescription: 'A simple blog to pen my coding journey and a bit about me. Occassionally.',
   plugins: [
     {
       use: '@gridsome/source-filesystem',
       options: {
         path: 'content/posts/**/*.md',
         typeName: 'Post',
-        route: '/blog/:slug'
+        route: '/read/:slug'
       }
     }
   ],
