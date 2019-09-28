@@ -13,12 +13,12 @@ body {
   line-height: 1.5;
   border: 15px solid #1184e2;
   min-height: 100vh;
-  overflow: auto;
+  width: fit-content;
 }
 
 .layout {
-  max-width: 760px;
-  margin: 0;
+  max-width: max-content;
+  margin: 0 auto;
   padding-left: 20px;
   padding-right: 20px;
 }
