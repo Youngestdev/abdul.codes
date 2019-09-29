@@ -65,6 +65,6 @@ The other things I learnt which aren't new to me actually :
 
 Well, I store my little projects in a [30 Days of Code repository](https://github.com/Youngestdev/30daysOfCode) and you can get a live preview here - [Abdul's 30 Days of Code](https://30doc.abdul.codes).
 
-Apologies, I suck at color rhyming. The little sense it makes is as a result of my Sensei's guide, lol. I still have little adjustments to do there but of course, my project view for mobile and desktop is balanced, haha!
+Apologies, I suck at color rhyming. The little sense it makes is as a result of my Sensei's guide, lol. I still have little adjustments to do there but of course, my project's view for mobile and desktop is balanced, haha!
 
 ##### Until then!
