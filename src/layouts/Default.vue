@@ -31,7 +31,7 @@ body {
 .layout {
   margin: 0 auto;
   padding-left: 20px;
-  padding-right: 0px;
+  padding-right: 20px;
 }
 
 .footer {
