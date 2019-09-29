@@ -39,7 +39,6 @@ body {
   padding-top: calc(30em / 4);
   text-align: center;
   font-size: 1.7em;
-  font-family: "IBM Plex Sans";
 }
 
 .link {
