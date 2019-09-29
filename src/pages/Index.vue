@@ -47,14 +47,13 @@ query {
 
 <style>
 .header {
-  font-family: "serif";
-  font-size: 25px;
+  font-family: "Stylish";
+  font-size: 15px;
   text-align: center;
   line-height: 20px;
-  padding: 0.9em;
 }
 
 .header p {
-  font-weight: 200;
+  font-weight: 100;
 }
 </style>
