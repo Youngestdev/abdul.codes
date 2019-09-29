@@ -47,11 +47,11 @@ query {
 
 <style>
 .header {
-  font-family: "Stylish";
-  font-size: 35px;
+  font-family: "serif";
+  font-size: 25px;
   text-align: center;
   line-height: 20px;
-  padding: 0.7em;
+  padding: 0.9em;
 }
 
 .header p {

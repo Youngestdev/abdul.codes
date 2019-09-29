@@ -20,14 +20,14 @@ body {
   padding: 0;
   padding-bottom: 20px;
   line-height: 1.5;
-  border: 15px solid #1184e2;
+  border: 12px solid #1184e2;
   min-height: 100vh;
 }
 
 .layout {
   margin: 0 auto;
   padding-left: 20px;
-  padding-right: 20px;
+  padding-right: 0px;
 }
 
 .footer {
