@@ -41,6 +41,7 @@ query Post ($path: String!) {
 
 .post-content {
   font-size: 20px;
-  font-family: "IBM Plex Sans"
+  font-family: "IBM Plex Sans";
+  width: inherit;  
 }
 </style>
