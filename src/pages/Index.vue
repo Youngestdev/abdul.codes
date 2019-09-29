@@ -48,13 +48,12 @@ query {
 <style>
 .header {
   font-family: "Stylish";
-  font-size: 35px;
+  font-size: 15px;
   text-align: center;
   line-height: 20px;
-  padding: 0.7em;
 }
 
 .header p {
-  font-weight: 200;
+  font-weight: 100;
 }
 </style>
