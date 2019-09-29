@@ -42,8 +42,9 @@ body {
 }
 
 .footer p {
-  font-weight: 400;
   font-family: "Stylish";
+  font-size: 1em;
+  font-weight: 400;
 }
 
 .link {
