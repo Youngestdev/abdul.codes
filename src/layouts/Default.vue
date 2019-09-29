@@ -41,6 +41,11 @@ body {
   font-size: 1em;
 }
 
+.footer p {
+  font-weight: 400;
+  font-family: "Stylish";
+}
+
 .link {
   border: 2px solid transparent;
   padding: 7px;
