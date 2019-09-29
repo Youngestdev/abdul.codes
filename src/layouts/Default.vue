@@ -43,7 +43,6 @@ body {
 
 .footer p {
   font-family: "Stylish";
-  font-size: 1rem;
   font-weight: 400;
 }
 
