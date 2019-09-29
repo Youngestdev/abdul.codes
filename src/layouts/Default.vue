@@ -38,12 +38,8 @@ body {
 .footer {
   padding-top: calc(30em / 4);
   text-align: center;
-  font-size: 1em;
-}
-
-.footer p {
-  font-family: "Stylish";
-  font-weight: 400;
+  font-size: 1.7em;
+  font-family: "IBM Plex Sans";
 }
 
 .link {
