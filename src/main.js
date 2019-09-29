@@ -8,6 +8,10 @@ export default function (Vue, { router, head, isClient }) {
     rel: 'stylesheet',
     href: 'https://fonts.googleapis.com/css?family=Stylish&display=swap'
   }),
+  head.link.push({
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap'
+  }),
   // Set default layout as a global component
   Vue.component('Layout', DefaultLayout)
 }

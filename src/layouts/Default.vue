@@ -29,15 +29,17 @@ body {
 }
 
 .layout {
+  max-width: 780px;
   margin: 0 auto;
   padding-left: 20px;
-  padding-right: 0px;
+  padding-right: 20px;
 }
 
 .footer {
   padding-top: calc(30em / 4);
   text-align: center;
-  font-size: 1em;
+  font-size: 1.7em;
+  font-family: "Stylish";
 }
 
 .link {

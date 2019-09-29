@@ -28,7 +28,7 @@ query Post ($path: String!) {
 
 .post-title {
   text-align: center;
-  font-size: 30px;
+  font-size: 18px;
   line-height: 10px;
   padding: 2em 0;
   font-family: 'Stylish';
@@ -41,5 +41,8 @@ query Post ($path: String!) {
 
 .post-content {
   font-size: 20px;
+  font-family: "IBM Plex Sans", 'Stylish';
+  width: auto;
+  overflow: auto;  
 }
 </style>
