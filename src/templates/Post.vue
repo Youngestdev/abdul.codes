@@ -42,7 +42,7 @@ query Post ($path: String!) {
 .post-content {
   font-size: 20px;
   font-family: "IBM Plex Sans", 'Stylish';
-  width: fit-content;
+  width: auto;
   overflow: auto;  
 }
 </style>
