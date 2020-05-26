@@ -4,7 +4,7 @@ description: "Beginning a new path in the world of IT: DevOps."
 date: 2020-05-26
 ---
 
-In the [previous post](./confusef.md), I stated that I'll be deciding what part to take next. Well, I'll be working on a path to becoming a DevOps engineer. I started today and this post is about what I have done today.
+In the [previous post](./confused.md), I stated that I'll be deciding what part to take next. Well, I'll be working on a path to becoming a DevOps engineer. I started today and this post is about what I have done today.
 
 ## Yesterday,
 
