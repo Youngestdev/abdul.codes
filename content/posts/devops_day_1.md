@@ -1,7 +1,7 @@
 ---
 title: "Beginning DevOps - Day 1"
 description: "Beginning a new path in the world of IT: DevOps."
-date: 2020-05-24
+date: 2020-05-26
 ---
 
 In the [previous post](./confusef.md), I stated that I'll be deciding what part to take next. Well, I'll be working on a path to becoming a DevOps engineer. I started today and this post is about what I have done today.
