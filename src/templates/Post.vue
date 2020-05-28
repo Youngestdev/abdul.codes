@@ -8,6 +8,8 @@
     </div>
     <div class="post-content">
       <p v-html="$page.post.content" />
+      <hr/>
+      <vue-disqus shortname="youngestdev" :identifier="$page.post.title"></vue-disqus>
     </div>
   </Layout>
 </template>
