@@ -37,6 +37,10 @@ There are two classes of auto scaling:
 
 Auto scaling is carried out based on policies set by the user.
 
+### Route 53
+
+Amazon provides DNS routing services. The route 53 service is used to allocate to a domain an amazon ec2 instance IP address, domain names can be bought and registered in route 53 too.
+
 ### Amazon Relational Database Services
 
 AWS provides access to relational database services such as MySQL, MongoDB, MariaDB etc. They also provide backup services that asynchronously updates the backup database on every update passed to the main database.
