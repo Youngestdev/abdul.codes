@@ -31,7 +31,7 @@ Now, I have a new OS installed and didn't download that book again for these rea
 + Lack of cautionary messages
 + Not beginner friendly
 
-I'll just tread carefully with these books and use more of documentations tbh, I should've known better than to run `sudo` carelessly but, mistakes happens and that's a lesson I def won't make again.. hopefully.
+I'll just tread carefully with these books and use more of documentations tbh, I should've known better than to run `sudo` carelessly but, mistakes happens and that's a mistake I def won't make again.. hopefully.
 
 ## Next steps
 
