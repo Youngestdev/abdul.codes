@@ -27,7 +27,7 @@ I started this journey after taking my time to decide what I want, the console h
 
 ---
 
-I had one of the best weeks in 2019 tbh. I mean, it was fun all through, and I'm pretty sure there's more fun ahead. I have also learned that there are more tools, and it depends on which works for you and/or gets the job done easily.
+I had one of the best weeks in 2020 tbh. I mean, it was fun all through, and I'm pretty sure there's more fun ahead. I have also learned that there are more tools, and it depends on which works for you and/or gets the job done easily.
 
 Although, there are preferences based on popularity, flexibility etc. Choose, and understand that which works for you.
 
