@@ -14,7 +14,7 @@ Uhm. The Google interview requires me to study hard and solve data structures an
 
 What do I do? Idk. I'll just try to balance my activities, and study for both accurately. I mean, if I focus more on the algorithms and data structure, and leave what my heart truly want, I'll never be contented, fulfilled and satisfied.
 
-I have a habit of making sure I do things I love, irrespective of how hard it might be. Although a tech expert, Edem, helped clarify basically that every aspect of tech has its uses and that's actually true. It is ideal to have both knowledge, how do I manage the mental stress & burden doing both bring? How am I sure I'm not being partial to any of the study?
+I have a habit of making sure I do things I love, irrespective of how hard it might be. Although a tech expert & a personal mentor, Edem, helped clarify basically that every aspect of tech has its uses and that's actually true. It is ideal to have both knowledge, how do I manage the mental stress & burden doing both brings? How am I sure I'm not being partial to any of the study?
 
 It's not like I'm very good at data structures and algorithms per se, truth be told, I'm really not good at many things. I'm just a smart ass that's able to manipulate things to get what he wants.
 
