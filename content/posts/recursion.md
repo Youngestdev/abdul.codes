@@ -35,10 +35,12 @@ def inOrderTraversal(root):
     return self.inOrderTraversal(root.left) + [root.val] + self.inOrderTraversal(root.right)
 ```
 
-Wait, what? Just how many lines of code? That's recursion for you.. However, you can also
+Wait, what? Just how many lines of code? That's recursion for you.. 
+
+However, you can also
 traverse this tree iteratively. But, who likes stress? Not me sha.
 
-So what this code does it traverse the every parent node from left to root to right i.e, our result is => `[4,2,1,3,7,6,9]`
+So what this code does is it traverse every parent node from left to root to right i.e, our result is => `[4,2,1,3,7,6,9]`
 
 Think of it like this because to be honest, I think this is how it works:
 
