@@ -6,7 +6,7 @@ date: 2020-06-11
 
 I don't know it all, I might be wrong, If I'm wrong, please correct me.
 
----
+## Exploring Recursion
 
 A simple binary tree displayed below, and I'll be trying to explain recursion with it.
 
@@ -57,7 +57,7 @@ Haha, nope. The values are added to the main stack as they leave the recursion s
 
 Here's a diagrammatic representation which is also my first time using Excalidraw..
 
- ![Recursion Tree](./imgs/Recursion%20Tree.png)
+ ![Recursion Tree](./imgs/RT.png)
 
 ## Teinz
 
