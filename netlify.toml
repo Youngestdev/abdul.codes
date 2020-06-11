@@ -1,5 +1,5 @@
 [build]
 
-command = "yarn build"
+command = "npm build"
 publish = "dist"
 environment = { NODE_VERSION = "10" }
