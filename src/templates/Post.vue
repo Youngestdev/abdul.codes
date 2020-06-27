@@ -47,4 +47,11 @@ query Post ($path: String!) {
   width: auto;
   overflow: auto;  
 }
+
+img {
+    display: block;
+    margin: auto auto;
+    max-width: 100%;
+    height: auto;
+}
 </style>
