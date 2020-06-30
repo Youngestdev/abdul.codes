@@ -44,8 +44,17 @@ query Post ($path: String!) {
 .post-content {
   font-size: 20px;
   font-family: "IBM Plex Sans", 'Stylish';
+  max-width: 100%;
   width: auto;
   overflow: auto;  
+}
+
+pre {
+    display: block;
+    border: #333333 1px;
+    overflow: auto;
+    overflow-scrolling: auto;
+    overflow-style: marquee-block;
 }
 
 img {
