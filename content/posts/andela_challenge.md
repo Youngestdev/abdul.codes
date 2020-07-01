@@ -8,8 +8,8 @@ I got wind of the Andela "Crack the Code" challenge last Friday. I couldn't comp
 
 **If you have the full questions at hand, please reach out to me via the comment section!**
 
- It was a priced challenge, and I actually didn't do it for the gram lmao. Just to measure how far I can solve algos, really.
---
+> It was a priced challenge, and I actually didn't do it for the gram lmao. Just to measure how far I can solve algos, really.
+
 
 
 The first question is very easy, although I don't think my solution was optimal tbh. Here's the problem statement:
@@ -34,7 +34,7 @@ The question above indicates that it's a count and sort problem - record the fre
 
 The first test case is an example of the above highlighted condition.
 
-### Solution
+## Solution
 
 Naturally, I would store the frequencies in a dictionary ( HashMap ) and return the numbers according to their frequency or reversed, but that won't work for all cases, unfortunately.
  
