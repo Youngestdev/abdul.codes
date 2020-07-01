@@ -50,11 +50,21 @@ query Post ($path: String!) {
 }
 
 pre {
+    background: navajowhite;
     display: block;
-    border: #333333 1px;
+    border: #333333 1px solid;
+    padding: 10px;
+    margin: 0 auto;
     overflow: auto;
     overflow-scrolling: auto;
     overflow-style: marquee-block;
+    /*font-family: ;*/
+}
+
+code {
+    display: inline-block;
+    font-weight: bold;
+    font-family: "Khmer Mondulkiri",sans-serif;
 }
 
 img {
