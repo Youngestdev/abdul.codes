@@ -47,7 +47,7 @@ So, what I did instead was store the values in a dictionary alongside their freq
 
 Here's the code:
 
-```
+```py{codeTitle: GroupSort.py}{numberLines: true}
 def groupSort(arr):
     store = {}
     for i in range(len(arr)):

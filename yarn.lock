@@ -4040,6 +4040,16 @@ gray-matter@^4.0.2:
     section-matter "^1.0.0"
     strip-bom-string "^1.0.0"
 
+gridsome-plugin-remark-prismjs-all@^0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/gridsome-plugin-remark-prismjs-all/-/gridsome-plugin-remark-prismjs-all-0.3.5.tgz#5365bd0b1caa1a0a0360255b80cbfe3e1e5f7179"
+  integrity sha512-Rl4g2mHUh7m/pEEBEVRHClPlDdh/YGYYN6nePdKg9c7WEe7gCq8Z1vk5lJ/iV908zLid/eEhk9+dffgDtXCLFw==
+  dependencies:
+    lodash "^4.17.15"
+    parse-numeric-range "^0.0.2"
+    prismjs "^1.19.0"
+    unist-util-visit "^2.0.2"
+
 gridsome@^0.6.0:
   version "0.6.9"
   resolved "https://registry.yarnpkg.com/gridsome/-/gridsome-0.6.9.tgz#2dc8ff8d6124f3be30b056ca5c9715499bbb4dc8"
@@ -6291,6 +6301,11 @@ parse-json@^4.0.0:
     error-ex "^1.3.1"
     json-parse-better-errors "^1.0.1"
 
+parse-numeric-range@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/parse-numeric-range/-/parse-numeric-range-0.0.2.tgz#b4f09d413c7adbcd987f6e9233c7b4b210c938e4"
+  integrity sha1-tPCdQTx6282Yf26SM8e0shDJOOQ=
+
 parseurl@~1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.3.tgz#9da19e7bee8d12dff0513ed5b76957793bc2e8d4"
@@ -6862,7 +6877,7 @@ pretty-error@^2.0.2:
     renderkid "^2.0.1"
     utila "~0.4"
 
-prismjs@^1.15.0:
+prismjs@^1.15.0, prismjs@^1.19.0:
   version "1.20.0"
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.20.0.tgz#9b685fc480a3514ee7198eac6a3bf5024319ff03"
   integrity sha512-AEDjSrVNkynnw6A+B1DsFkd6AVdTnp+/WoUixFRULlCLZVRZlVQMVWio/16jv7G1FscUxQxOQhWwApgbnxr6kQ==
@@ -8651,7 +8666,7 @@ unist-util-visit@^1.0.0, unist-util-visit@^1.0.1, unist-util-visit@^1.1.0, unist
   dependencies:
     unist-util-visit-parents "^2.0.0"
 
-unist-util-visit@^2.0.1:
+unist-util-visit@^2.0.1, unist-util-visit@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/unist-util-visit/-/unist-util-visit-2.0.2.tgz#3843782a517de3d2357b4c193b24af2d9366afb7"
   integrity sha512-HoHNhGnKj6y+Sq+7ASo2zpVdfdRifhTgX2KTU3B/sO/TTlZchp7E3S4vjRzDJ7L60KmrCPsQkVK3lEF3cz36XQ==

@@ -12,7 +12,7 @@ A simple binary tree displayed below, and I'll be trying to explain recursion wi
 
 Say the code for our tree node is:
 
-```py
+```py{codeTitle: TreeNode.py}
 class TreeNode:
     def __init__(self, val = 0, left = None, right = None):
         self.val = val
@@ -28,7 +28,7 @@ An inorder traversal is carried out easily using recursion...
 
 The code for that is:
 
-```py
+```py{codeTitle: InorderTraversal.py}
 def inOrderTraversal(root):
     if not root: # If there's no root, return an empty array.
         return []

@@ -23,7 +23,7 @@ module.exports = {
       externalLinksTarget: '_blank',
       externalLinksRel: ['nofollow', 'noopener', 'noreferrer'],
       plugins: [
-        '@gridsome/remark-prismjs'
+        'gridsome-plugin-remark-prismjs-all'
       ]
     }
   },

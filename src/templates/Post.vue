@@ -33,7 +33,7 @@ query Post ($path: String!) {
   font-size: 18px;
   line-height: 40px;
   padding: 2em 0;
-  font-family: 'Stylish';
+  font-family: 'Stylish',serif;
 }
 
 .post-date {
@@ -42,29 +42,12 @@ query Post ($path: String!) {
 }
 
 .post-content {
+  place-content: center;
   font-size: 20px;
-  font-family: "IBM Plex Sans", 'Stylish';
+  font-family: "IBM Plex Sans", 'Stylish',serif;
   max-width: 100%;
   width: auto;
-  overflow: auto;  
-}
-
-pre {
-    background: navajowhite;
-    display: block;
-    border: #333333 1px solid;
-    padding: 10px;
-    margin: 0 auto;
-    overflow: auto;
-    overflow-scrolling: auto;
-    overflow-style: marquee-block;
-    /*font-family: ;*/
-}
-
-code {
-    display: inline-block;
-    font-weight: bold;
-    font-family: "Khmer Mondulkiri",sans-serif;
+  overflow: auto;
 }
 
 img {

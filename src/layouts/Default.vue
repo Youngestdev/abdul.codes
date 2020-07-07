@@ -28,7 +28,8 @@ body {
 }
 
 .layout {
-  max-width: 780px;
+  width: auto;
+  max-width: 800px;
   margin: 0 auto;
   padding-left: 20px;
   padding-right: 20px;
@@ -47,4 +48,12 @@ body {
   color: #333;
   text-decoration: none;
 }
+
+pre {
+  font-size: 15px;
+  padding: 1em;
+  margin: 0.5em  0;
+  overflow: auto;
+}
+
 </style>
