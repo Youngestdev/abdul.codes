@@ -43,7 +43,7 @@ In JavaScript (Credits to Tomiwa) :
 
 ```javascript {codeTitle: LongestSequence.js}{numberLines: true}
 function sequence(arr){
-    // Create a 2D array and fill it with 1s => [[1,1,1,1,1], [1,1,1,1,1,1]]
+    // Create a 2D array and fill it with 1s => [[1,1], [1,1], [1,1]]
     var dp = new Array(arr.length);
 
     for(var i = 0; i < dp.length; i++){
