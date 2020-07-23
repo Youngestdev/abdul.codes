@@ -91,9 +91,9 @@ Here, we'll use 3 loops to get the children. One for the grandparent, One for th
 ```python{codeTitle: Looping through a 3-D array}
 arr = [[[1,2,3], [4,5,6], [7,8,9]]]
 for grandparent in range(len(arr)):
-     for parent in range(len(a[grandparent])):
-       for child in range(len(a[grandparent][[parent])):
-         print(a[grandparent][parent][children])
+     for parent in range(len(arr[grandparent])):
+       for child in range(len(arr[grandparent][[parent])):
+         print(arr[grandparent][parent][children])
 
 # 1,2,3,4,5,6,7,8,9
 ``` 
