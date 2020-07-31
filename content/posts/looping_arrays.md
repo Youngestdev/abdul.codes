@@ -5,7 +5,7 @@ date: 2020-07-22
 ---
 
 
-Arrays are mutable data structures where you can store variables. These variables aren't limited to the array itself. Most of it's operations are linear time except for look up, which is constant time.
+Arrays are mutable data structures where you can store variables. These variables aren't limited to the array itself. Most of its operations are linear time except for look up, which is constant time.
 
 A few days ago, a friend who's learning Python asked for a review and some explanations on printing the values from a 2D array. So I thought, why not even jot it here..
 
