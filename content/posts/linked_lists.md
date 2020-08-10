@@ -18,7 +18,7 @@ Here is a representation of a linked list:
 
 ![Linked List Representation](./imgs/linked-list-repr.png)
 
-> In summary, a linked list is a connection of nodes pointing to each other in no manner, actually.
+> In summary, a linked list is a collection of nodes pointing to each other in no manner, actually.
 
 ## Types of Linked Lists
 
@@ -34,7 +34,7 @@ The above are the basic three types, other sub derivations can be made e.g circu
 
 ### Singly linked list
 
-A singly linked list is defined by its node. A singly linked list node has a value and the next pointer, the linked list above is an example of a singly linked list.
+A singly linked list is defined by its node. A singly linked list node has a value and the next pointer, the linked list diagram below is an example of a singly linked list.
 
 ![Linked List Representation](./imgs/linked-list-repr.png)
 
@@ -75,7 +75,7 @@ The stress of instantiating a new node class everytime pushses us to write a cla
 
 ### 2. Doubly Linked List
 
-In simple words, this linked list is linked at both end. A doubly linked list node points to the previous node and the next node.
+In simple words, this linked list node is linked at both end. A doubly linked list node points to the previous node and the next node.
 
 Here is a graphical representation:
 
