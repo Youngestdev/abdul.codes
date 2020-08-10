@@ -15,6 +15,10 @@ export default function (Vue, { router, head, isClient }) {
     rel: 'stylesheet',
     href: 'https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap'
   }),
+  head.link.push({
+    rel: 'favicon',
+    href: './favicon.png'
+  }),
   // Set default layout as a global component
   Vue.component('Layout', DefaultLayout)
   Vue.use(VueDisqus)
