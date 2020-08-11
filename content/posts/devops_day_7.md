@@ -10,7 +10,7 @@ In the [previous post](/read/beginning-dev-ops-day-5), I was trying to get ansib
 
 I actually didn't do any study today tbh. I took today off to rest and read another book, "Black Swan". However, I deployed a node app with docker.
 
-![Hello from docker](imgs/docker.png)
+![Hello from docker](https://res.cloudinary.com/adeshina/image/upload/v1597157704/ktfjinowtjpkyxrj8pye.png)
 
 Docker seems to be the most friendly tool to me tbh, I so much love it haha! Well, this post will be a recap:
 

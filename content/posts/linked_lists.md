@@ -16,7 +16,7 @@ The connection from node to node differentiates it from the normal list or array
 
 Here is a representation of a linked list:
 
-![Linked List Representation](./imgs/linked-list-repr.png)
+![Linked List Representation](https://res.cloudinary.com/adeshina/image/upload/v1597157838/b4sctsjpwhk2dtkm5xsk.png)
 
 > In summary, a linked list is a collection of nodes pointing to each other in no manner, actually.
 
@@ -36,7 +36,7 @@ The above are the basic three types, other sub derivations can be made e.g circu
 
 A singly linked list is defined by its node. A singly linked list node has a value and the next pointer, the linked list diagram below is an example of a singly linked list.
 
-![Linked List Representation](./imgs/linked-list-repr.png)
+![Linked List Representation](https://res.cloudinary.com/adeshina/image/upload/v1597157838/b4sctsjpwhk2dtkm5xsk.png)
 
 A singly linked list node implementation is like this:
 
@@ -79,7 +79,7 @@ In simple words, this linked list node is linked at both end. A doubly linked li
 
 Here is a graphical representation:
 
-![Doubly linked list](./imgs/doubly-linked-list.png)
+![Doubly linked list](https://res.cloudinary.com/adeshina/image/upload/v1597158164/klpnmjakwc5q1snsv5v2.png)
 
 The implementation of a doubly linked list node is:
 
@@ -109,7 +109,7 @@ The circular linked list node is a singly linked list except that the last node 
 
 Here's a diagram:
 
-![Circular linked list](./imgs/circular-linked-list.png)
+![Circular linked list](https://res.cloudinary.com/adeshina/image/upload/v1597158022/xssdyic9p9q8mvgmg6rz.png)
 
 The implementation is the same as the singly linked list except that the linked list class itself ensures that every new node sets its next pointer to the head of the list.
 

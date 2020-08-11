@@ -22,7 +22,7 @@ class TreeNode:
 
 So for the awkwardly drawn tree ( I no sabi draw like that ), we have 7 nodes in total: A root node, 3, child, 2 and 6, and their offspring, 4, 1, 7, 9 ( You sha get?).
 
-![Binary Search Tree](./imgs/BT.png)
+![Binary Search Tree](https://res.cloudinary.com/adeshina/image/upload/v1597157597/w3picgjq7c7td9yfeuos.png)
 
 An inorder traversal is carried out easily using recursion...
 
@@ -59,7 +59,7 @@ Haha, nope. The values are added to the main stack as they leave the recursion s
 
 Here's a diagrammatic representation which is also my first time using Excalidraw..
 
- ![Recursion Tree](./imgs/RT.png)
+ ![Recursion Tree](https://res.cloudinary.com/adeshina/image/upload/v1597158241/vgsvvtlcnasjkn0aonvj.png)
 
 ## Teinz
 
