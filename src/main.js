@@ -17,7 +17,7 @@ export default function (Vue, { router, head, isClient }) {
   }),
   head.link.push({
     rel: 'favicon',
-    href: './favicon.png'
+    href: 'https://res.cloudinary.com/adeshina/image/upload/v1597158363/x8kh4xqni1ktuc4mb3v7.ico'
   }),
   // Set default layout as a global component
   Vue.component('Layout', DefaultLayout)
