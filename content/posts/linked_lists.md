@@ -10,7 +10,7 @@ Linked list was the first data structure that gave me tough time. I wanted to un
 
 Of course, lists that are linked together. The first time I heard of this, I thought linked lists were contiguous arrays like `[1,2,3,4][5,6,7]`. Haha! I wasn't far from the meaning, just that it wasn't as I thought.
 
-A linked list is a contiguous list of nodes where a node is a block structure housing the node value and a pointer (or memory) address to the next node. Each node from the head node has a next pointer that keeps the address of the next till it gets to the last node that points to nothing. 
+A linked list is a continuous list of nodes where a node is a block structure housing the node value and a pointer (or memory) address to the next node. Each node from the head node has a next pointer that keeps the address of the next till it gets to the last node that points to nothing. 
 
 The connection from node to node differentiates it from the normal list or array. Arrays don't keep track of their next values or other values unlike the linked lists.
 
