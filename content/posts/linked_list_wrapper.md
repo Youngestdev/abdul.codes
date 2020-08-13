@@ -1,5 +1,5 @@
 --- 
-title: "Linked List 101 - The Linked List class" 
+title: "Linked Lists 101 - The Linked List class" 
 description: "In this blog post, I'd discuss the linked list class, the use and some of its methods." 
 date: 2020-08-13 
 ---
