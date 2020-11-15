@@ -18,6 +18,10 @@ export default function (Vue, { router, head, isClient }) {
   head.link.push({
     rel: 'favicon',
     href: 'https://res.cloudinary.com/adeshina/image/upload/v1597158363/x8kh4xqni1ktuc4mb3v7.ico'
+  })
+  head.meta.push({
+    name: 'google-site-verification',
+    content: 'sIbGxCmGnUobPKM6wa8WJZaHqfW7XJZP6WUEDaIo90o'
   }),
   // Set default layout as a global component
   Vue.component('Layout', DefaultLayout)
