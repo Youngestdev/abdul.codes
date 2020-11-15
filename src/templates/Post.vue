@@ -26,6 +26,40 @@ query Post ($path: String!) {
 }
 </page-query>
 
+export default {
+  metaInfo() {
+    return {
+      title: this.$page.post.title,
+      meta: [
+        {
+          name: "description",
+          content: this.$page.post.excerpt
+        },
+        {
+          property: "og:title",
+          content: this.$page.post.title
+        },
+        {
+          name: "twitter:card",
+          content: this.$page.post.image ? "summary_large_image" : "summary",
+        },
+        {
+          name: "twitter:creator",
+          content: "@kvng_zeez"
+        },
+        {
+          property: "og:description",
+          cotent: this.$page.post.excerpt
+        },
+        {
+          property: "og:image",
+          content: this.$page.post.image || ""
+        }
+      ]
+    };
+  }
+}
+
 <style>
 
 #go-back {

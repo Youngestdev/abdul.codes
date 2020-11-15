@@ -23,7 +23,7 @@ export default {
     Pager
   },
   metaInfo: {
-    title: "A simple blog"
+    title: "Blog"
   }
 };
 </script>
