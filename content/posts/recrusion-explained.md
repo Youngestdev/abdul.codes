@@ -1,7 +1,7 @@
 --- 
 title: "Understanding Recursion" 
 description: "In this post, I give a better explanation of what recursion is and how it works."
-date: 2020-11-20 
+date: 2020-11-21 
 ---
 
 One of the most interesting concepts in intermediate programming is recursion. I used the word intermediate because you usually do not need it for simple tasks.
