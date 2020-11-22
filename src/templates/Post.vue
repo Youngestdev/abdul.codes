@@ -3,11 +3,11 @@
     <br>
     <a @click="$router.go(-1)" class="link" id="go-back" aria-label="Go back">&larr; Go Back</a>
     <div class="post-title">
-      <h1>{{$page.post.title}}</h1>
-      <p class="post-date"> {{ $page.post.date}} | {{$page.post.timeToRead}} min read</p>
+      <h1>{{ $page.post.title }}</h1>
+      <p class="post-date"> {{ $page.post.date }} | {{ $page.post.timeToRead }} min read</p>
     </div>
     <div class="post-content">
-      <p v-html="$page.post.content" />
+      <p v-html="$page.post.content"/>
       <hr/>
       <vue-disqus shortname="youngestdev" :identifier="$page.post.title"></vue-disqus>
     </div>
@@ -16,15 +16,17 @@
 
 <page-query>
 query Post ($path: String!) {
-   post: post (path: $path) {
-    id
-    title
-    content
-    date (format: "D MMMM YYYY")
-    timeToRead
-  }
+post: post (path: $path) {
+id
+title
+content
+date (format: "D MMMM YYYY")
+timeToRead
+}
 }
 </page-query>
+
+<script>
 
 export default {
   metaInfo() {
@@ -36,10 +38,6 @@ export default {
           content: this.$page.post.excerpt
         },
         {
-          property: "og:title",
-          content: this.$page.post.title
-        },
-        {
           name: "twitter:card",
           content: this.$page.post.image ? "summary_large_image" : "summary",
         },
@@ -48,17 +46,35 @@ export default {
           content: "@kvng_zeez"
         },
         {
-          property: "og:description",
-          cotent: this.$page.post.excerpt
+          name: "twitter:description",
+          content: this.$page.post.excerpt
         },
         {
-          property: "og:image",
+          name: "twitter:image",
           content: this.$page.post.image || ""
-        }
-      ]
+        },
+        {
+          name: "twitter:site",
+          content: "@kvng_zeez"
+        },
+        {property: "og:type", content: "article"},
+        {property: "og:title", content: this.$page.post.title},
+        {property: "og:description", content: this.$page.post.excerpt},
+        {
+          property: "og:url",
+          content: `${this.getBaseUrl}${this.$page.post.path}`
+        },
+        {
+          property: "article:published_time",
+          content: moment(this.$page.post.date).format("MM-DD-YYYY")
+        },
+        {property: "og:updated_time", content: this.$page.post.date},
+      ],
+      script: [{src: "https://platform.twitter.com/widgets.js", async: true}]
     };
   }
 }
+</script>
 
 <style>
 
@@ -71,7 +87,7 @@ export default {
   font-size: 18px;
   line-height: 40px;
   padding: 2em 0;
-  font-family: 'Stylish',serif;
+  font-family: 'Stylish', serif;
 }
 
 .post-date {
@@ -82,16 +98,16 @@ export default {
 .post-content {
   place-content: center;
   font-size: 20px;
-  font-family: "IBM Plex Sans", 'Stylish',serif;
+  font-family: "IBM Plex Sans", 'Stylish', serif;
   max-width: 100%;
   width: auto;
   overflow: auto;
 }
 
 img {
-    display: block;
-    margin: auto auto;
-    max-width: 100%;
-    height: auto;
+  display: block;
+  margin: auto auto;
+  max-width: 100%;
+  height: auto;
 }
 </style>
