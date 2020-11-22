@@ -27,7 +27,7 @@ timeToRead
 </page-query>
 
 <script>
-
+import moment from "moment";
 export default {
   metaInfo() {
     return {
