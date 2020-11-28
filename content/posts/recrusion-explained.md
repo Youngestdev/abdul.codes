@@ -42,7 +42,7 @@ A recursion tree is basically a normal tree. It is only used to illustrate the r
 
 It is particularly useful to understand the execution process of a recursive function.
 
-## Defining recursive function
+## Defining a recursive function
 
 A recursive function is just another normal function except that it calls itself. The fact that it calls itself requires that we set break clauses in the parent function. Like I said earlier, mimicking the earlier function will lead into an error. This error is the **Maximum recursion depth exceeded** error. Let's take a look at an example:
 
