@@ -64,11 +64,6 @@ export default {
           property: "og:url",
           content: `${this.getBaseUrl}${this.$page.post.path}`
         },
-        {
-          property: "article:published_time",
-          content: moment(this.$page.post.date).format("MM-DD-YYYY")
-        },
-        {property: "og:updated_time", content: this.$page.post.date},
       ],
       script: [{src: "https://platform.twitter.com/widgets.js", async: true}]
     };
