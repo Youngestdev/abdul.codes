@@ -6,6 +6,7 @@
 
 module.exports = {
   siteName: 'Abdul\'s Musings',
+  siteUrl: 'blog.youngest.dev',
   siteDescription: 'A simple blog to pen my findings and idk idk.',
   plugins: [
     {
@@ -15,7 +16,14 @@ module.exports = {
         typeName: 'Post',
         route: '/read/:slug'
       }
-    }
+    },
+    {
+      use: '@gridsome/plugin-sitemap',
+      options: {
+        exclude: ['/404'],
+      	include: ['/read/**', '/']
+      }
+    }	 
   ],
   transformers: {
     //Add markdown support to all file-system sources
