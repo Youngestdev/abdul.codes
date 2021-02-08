@@ -215,11 +215,15 @@ Print the answer.
 This question can be solved using the sliding window technique:
 
 ```python
-def solution(n, nums):
-    nums_set = set(nums)
-    for server_no in range(1, n+1):
-        if server_no not in nums_set:
-            return server_no
+def solution(k, arr):
+    window_start = 0
+    while window_start <= len(arr):
+        window = arr[window_start:k+window_start]
+        if len(set(window)) == k:
+            return window_start + 1
+        window_start += 1
+
+    return -1
 
 if __name__ == '__main__':
     try:
