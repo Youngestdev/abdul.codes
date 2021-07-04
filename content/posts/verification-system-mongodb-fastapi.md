@@ -24,7 +24,7 @@ The purpose of saving this in the database is to act as a point of validation wh
 
 I have tried to demonstrate this in the image below:
 
-![Excaldiraw diagram of the working principle](./process.svg)
+![Excaldiraw diagram of the working principle](https://res.cloudinary.com/laisi/image/upload/v1625402923/process_mr8vc4.svg)
 
 I must apologize ahead: In this article, I used an in-memory database. However, the concept is the same as when applied to a real database.
 
@@ -92,7 +92,6 @@ async def new_user(user: dict):
 
 @router.post("/sso")
 async def get_sso_link(user_id: int):
-    print(users)
     if users[user_id]:
         token = await generate_token(user_id)
         login_tokens.append(token)
@@ -199,3 +198,9 @@ Response:
 ## Conclusion
 
 A proper conclusion will be written once I have completed this draft. Until then, I'll say check back frequently.
+
+
+## References
+
+- My brain
+- Shortener inspiration: https://dev.to/lordghostx/build-and-deploy-a-serverless-url-shortener-with-python-and-fauna-3077
