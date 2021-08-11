@@ -26,7 +26,7 @@ I'm glad to announce that I have accepted this request and will be working towar
 
 > I am most importantly glad that my technical reviewers are pioneers of great work and, the developer community - wonderful folks.
 
-This will be the first in many of the books I hope to publish. I shall cover the very basics to intermediary/advanced level of FastAPI.
+This will be the first out of the many of the books I intend to publish. I shall cover the very basics to intermediary/advanced level of FastAPI.
 
 In advance, I beseech the support of the developer community in large, to *famz* my book when it's out.
 
