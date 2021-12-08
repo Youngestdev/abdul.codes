@@ -1,7 +1,7 @@
 --- 
-title: "Generating Prime Numbers in A Range of "N" Numbers" 
-description: "I just noticed interestingly, that prime numbers are basically +2 of the previous ones with exceptions." 
-date: 2021-12-08 
+title: "Generating Prime Numbers in A Range of "N" Numbers"
+description: "I just noticed interestingly, that prime numbers are basically +2 of the previous ones with exceptions."
+date: 2021-12-08
 ---
 
 ## Introduction
