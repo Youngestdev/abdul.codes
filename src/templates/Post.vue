@@ -6,6 +6,20 @@
       <h1>{{ $page.post.title }}</h1>
       <p class="post-date"> {{ $page.post.date }} | {{ $page.post.timeToRead }} min read</p>
     </div>
+    <figure
+        v-if="$page.post.image"
+        class="flex flex-col"
+    >
+      <g-image
+          :alt="$page.post.image.alt"
+          :src="$page.post.image.path"
+          class="mb-2"
+      />
+      <figcaption
+          class="self-center image-caption mb-15"
+          v-html="$page.post.image.caption"
+      />
+    </figure>
     <div class="post-content">
       <p v-html="$page.post.content"/>
       <hr/>
@@ -16,18 +30,24 @@
 
 <page-query>
 query Post ($path: String!) {
-post: post (path: $path) {
-id
-title
-content
-date (format: "D MMMM YYYY")
-timeToRead
-}
+  post: post (path: $path) {
+    id
+    title
+    content
+    date (format: "D MMMM YYYY")
+    timeToRead
+    image {
+      path
+      caption
+      alt
+    }
+  }
 }
 </page-query>
 
 <script>
 import moment from "moment";
+
 export default {
   metaInfo() {
     return {
