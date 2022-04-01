@@ -14,7 +14,7 @@ After an amazing one year working with Okteto, I am back in the job market looki
 
 At Okteto, I was responsible for handling community affairs as well as create technical and later on marketing content for the audience - users, customers, etc.
 
-Professionally, I have 4+ years worth of experience writing technical articles for various blogs ( listed at the end of this blog post ), as well as a documentation for a joint [crypto library](https://github.com/youngestdev/buycoins-python). I have recorded about 10 videos on Youtube for Okteto as well.
+Professionally, I have 4+ years worth of experience writing technical articles for various blogs ( listed at the end of this blog post ), as well as a documentation for a joint [crypto library](https://github.com/youngestdev/buycoins-python). I have also recorded a numbers of videos on Youtube for Okteto as well.
 
 Safe to say that I am skilled at what I do - Technical writing.
 
@@ -22,8 +22,8 @@ Safe to say that I am skilled at what I do - Technical writing.
 
 No. I happen to be a skilled Python programmer primarily focused on building [quick toolings](https://github.com/Youngestdev/treasure-hunter) and building web APIs with FastAPI:
 - [FastAPI + Mongo Boilerplate](https://github.com/Youngestdev/fastapi-mongo)
-- [iVote API - WIP](https://ivote-api.youngestdev.co)
-- [GetBoarded - WIP](https://api.getboarded.co/redoc).
+- [iVote API - WIP](https://ivote.youngestdev.co)
+- [GetBoarded - WIP](https://getboarded.co/).
 
 
 ## Works.
@@ -37,7 +37,7 @@ Still WIP: Building Web APIs with Python and FastAPI
 2. [TestDriven](https://testdriven.io/authors/adeshina/) - 3 articles.
 3. [Smashing Magazine](https://www.smashingmagazine.com/author/abdulazeez-adeshina/) - 1 article.
 4. [LogRocket](https://blog.logrocket.com/author/abdulazeezadeshina/) - 12 articles.
-5. [Okteto](https://www.okteto.com/blog/authors/abdulazeez-abdulazeez-adeshina/) - 19 Articles and videos ( inclusive)/
+5. [Okteto](https://www.okteto.com/blog/authors/abdulazeez-abdulazeez-adeshina/) - 19 Articles and videos ( inclusive).
 
 ## What offers are you looking for?
 
