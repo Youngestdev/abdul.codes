@@ -4,7 +4,7 @@ description: "In this article, I walk you through on how to build a crowdfund mo
 date: 2022-04-28 
 ---
 
-> Initially wrote this as an assessment in February for a role which didn't go work out after 2 long months ( one month unnecessary waiting ) of interviewing.
+>> I initially wrote this as an assessment in February for a role which didn't go work out after 2 long months ( one month unnecessary waiting ) of interviewing. Special thanks to Remi for staying up and helping with the test run the project. Chidi & Favour too, for reading the initial draft!
 
 [Starport](https://starport.com/) is a robust and flexible platform that provides the tools needed to scaffold a working decentralized application on its own independent blockain. If you're building a decentralised application and priotize ease of working, you should really look into leveraging starport.
 
