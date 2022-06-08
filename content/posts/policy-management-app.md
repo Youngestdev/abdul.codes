@@ -24,7 +24,6 @@ These ideally are system administrators or anyone who is tasked with managing au
 These are developers who can interact with the API directly and manage their policies with JSON. The API has been built to translate JSON to REG0 and can be used as a standalone i.e interacting with our hosted version or forked and used in-house.
 
 > It is important to note that the JSON sent adheres to the structure defined by the [API standards](https://github.com/r-scheele/rego_builder/issues/1).
-> 
 
 # API Design
 
@@ -57,7 +56,7 @@ The `command` key represents the operation to be defined as REGO. In this exampl
 
 The JSON above translates to the following in REGO:
 
-```jsx
+```js
 input.request_method == "GET"
 ```
 
