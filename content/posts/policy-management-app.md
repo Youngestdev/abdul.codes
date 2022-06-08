@@ -4,6 +4,7 @@ description: "I happen to be in charge of leading the build process for an open 
 date: 2022-06-08
 ---
 
+> I'm attempting to run my engineering processes on my blog.
 
 The policy management application is born from the need to manage Open Policy Agent ( OPA ) policies written in [REGO](https://www.openpolicyagent.org/docs/latest/policy-language/) from a user interface for non-technical users and an API through JSON for technical users.
 
@@ -133,7 +134,3 @@ The UPDATE and DELETE routes are currently a **WIP**.
 To disallow retrieval of policies by just anybody, the Sign in with GitHub will be used to retrieve user data which will, in turn, be used to store data and act as an accessor when attempting to perform any operation.
 
 The headers for authorization will *most likely* be encoded in JWT format. This is still undergoing deliberation - myself and Habeeb.
-
-## Comments and suggestions.
-
-Please leave all suggestions as comments.
