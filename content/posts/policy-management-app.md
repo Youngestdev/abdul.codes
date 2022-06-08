@@ -71,7 +71,7 @@ The API is built to accommodate all CRUD operations. The list of routes defined 
 
 The request lifecycle for a **POST** request is illustrated thus:
 
-![Untitled](Untitled.png)
+![Untitled](https://res.cloudinary.com/laisi/image/upload/v1654718824/Untitled_myacve.png)
 
 Each request sent to the API is made to pass through a series of checks:
 
@@ -112,14 +112,14 @@ The current screen available for the frontend is:
 
 - Create policy
     
-    ![Untitled](Untitled%201.png)
+    ![Untitled](https://res.cloudinary.com/laisi/image/upload/v1654718814/Untitled_1_ofsozv.png)
     
 
-![Screenshot 2022-06-08 at 10.40.10.png](Screenshot_2022-06-08_at_10.40.10.png)
+![Screenshot 2022-06-08 at 10.40.10.png](https://res.cloudinary.com/laisi/image/upload/v1654718827/Screenshot_2022-06-08_at_10.40.10_fxftq5.png)
 
 - View policy
     
-    ![Screenshot 2022-06-08 at 10.42.19.png](Screenshot_2022-06-08_at_10.42.19.png)
+    ![Screenshot 2022-06-08 at 10.42.19.png](https://res.cloudinary.com/laisi/image/upload/v1654718827/Screenshot_2022-06-08_at_10.42.19_xjo7it.png)
     
 
 The UPDATE and DELETE routes are currently a **WIP**.
