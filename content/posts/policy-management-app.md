@@ -43,13 +43,13 @@ A set of functions, let’s call them the **translator logic**, do the job of cr
 
 The JSON translated to REGO as stated earlier must conform to defined standards. A rule is defined in this manner:
 
-```json
+```py
 {
-    "command": "input_prop_equals",
-    "properties": {
+  "command": "input_prop_equals",
+  "properties": {
     "input_property": "request_method",
-      "value": "GET"
-    }
+    "value": "GET"
+  }
 }
 ```
 
@@ -71,7 +71,7 @@ The API is built to accommodate all CRUD operations. The list of routes defined 
 
 The request lifecycle for a **POST** request is illustrated thus:
 
-![Untitled](../../static/Untitled.png)
+![Untitled](assets/static/Untitled.png)
 
 Each request sent to the API is made to pass through a series of checks:
 
@@ -112,14 +112,14 @@ The current screen available for the frontend is:
 
 - Create policy
     
-    ![Untitled](../../static/Untitled%201.png)
+    ![Untitled](assets/static/Untitled%201.png)
     
 
-![Screenshot 2022-06-08 at 10.40.10.png](../../static/Screenshot_2022-06-08_at_10.40.10.png)
+![Screenshot 2022-06-08 at 10.40.10.png](assets/static/Screenshot_2022-06-08_at_10.40.10.png)
 
 - View policy
     
-    ![Screenshot 2022-06-08 at 10.42.19.png](../../static/Screenshot_2022-06-08_at_10.42.19.png)
+    ![Screenshot 2022-06-08 at 10.42.19.png](assets/static/Screenshot_2022-06-08_at_10.42.19.png)
     
 
 The UPDATE and DELETE routes are currently a **WIP**.
