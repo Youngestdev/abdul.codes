@@ -18,7 +18,7 @@ html {
   box-sizing: inherit;
 }
 body {
-  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+  font-family: "Lora", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   margin: 0;
   padding: 0 0 20px;
