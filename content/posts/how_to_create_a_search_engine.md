@@ -34,7 +34,7 @@ This is the most significant operation in a search engine. A query processor is 
 
 ### Indexer
 
-An indexer is responsible for storing data pulled by the crawler into a systematic order to allow for the easy location of data. The working principle of an indexer is to create an **********index********** which serves as a store for a collection of data as well as holding links to stored records - this is called indexing.
+An indexer is responsible for storing data pulled by the crawler into a systematic order to allow for the easy location of data. The working principle of an indexer is to create an **index** which serves as a store for a collection of data as well as holding links to stored records - this is called indexing.
 
 ### What is an index?
 
