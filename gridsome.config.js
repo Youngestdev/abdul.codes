@@ -17,18 +17,6 @@ module.exports = {
         route: '/read/:slug'
       }
     },
-    {
-      use: '@gridsome/source-filesystem',
-      options: {
-        path: 'blog/**/*.md',
-        route: '/blog/:year/:month/:day/:slug',
-        remark: {
-          plugins: [
-            'gridsome-remark-katex'
-          ]
-        }
-      }
-    },
   ],
   transformers: {
     //Add markdown support to all file-system sources
@@ -36,8 +24,10 @@ module.exports = {
       externalLinksTarget: '_blank',
       externalLinksRel: ['nofollow', 'noopener', 'noreferrer'],
       plugins: [
-        'gridsome-plugin-remark-prismjs-all'
+        'gridsome-plugin-remark-prismjs-all',
+        'gridsome-remark-katex',
       ]
-    }
+    },
+    
   },
 }
