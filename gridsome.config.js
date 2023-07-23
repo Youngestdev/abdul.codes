@@ -16,7 +16,19 @@ module.exports = {
         typeName: 'Post',
         route: '/read/:slug'
       }
-    },	 
+    },
+    {
+      use: '@gridsome/source-filesystem',
+      options: {
+        path: 'blog/**/*.md',
+        route: '/blog/:year/:month/:day/:slug',
+        remark: {
+          plugins: [
+            'gridsome-remark-katex'
+          ]
+        }
+      }
+    },
   ],
   transformers: {
     //Add markdown support to all file-system sources
