@@ -4,8 +4,6 @@ description: "In this article, we'll cover the basics of building a search engin
 date: 2023-07-23
 ---
 
-# How to build a vertical search engine
-
 A search engine is a program designed to retrieve information matching a supplied search term from a list of records or a database.
 
 A vertical search engine is a type of search engine designed for the retrieval of information specific to a particular niche. The vertical search engine is employed in information retrieval systems and differs from a horizontal search engine which is designed for a wider range of information.
