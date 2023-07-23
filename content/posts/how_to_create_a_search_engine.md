@@ -1,5 +1,5 @@
 ---
-title: "How To Build A Search Engine
+title: "How To Build A Search Engine"
 description: "In this article, we'll cover the basics of building a search engine"
 date: 2023-07-23
 ---
