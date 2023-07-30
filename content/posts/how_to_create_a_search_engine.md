@@ -16,7 +16,7 @@ A search engine ( and by extension, a vertical search engine ) comprises three c
 - indexer
 - query processor
 
-A search engine is dependent on the aforementioned components, who work hand-in-hand to provide specific functions. I’ve outlined briefly what the components do below:
+A search engine is dependent on the aforementioned components, which work hand-in-hand to provide specific functions. I’ve outlined briefly what the components do below:
 
 ### Crawler
 
