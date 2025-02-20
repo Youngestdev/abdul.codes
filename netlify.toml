@@ -2,4 +2,4 @@
 
 command = "yarn build"
 publish = "dist"
-environment = { NODE_VERSION = "14.17.5" }
+environment = { NODE_VERSION = "18.18.1" }
