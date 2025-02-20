@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html data-html-server-rendered="true" lang="en" data-vue-tag="lang">
+  <head>
+    <title data-vue-tag="true">How To Build A Search Engine - Abdul&#x27;s Musings</title><meta data-vue-tag="true" charset="utf-8"><meta data-vue-tag="true" name="generator" content="Gridsome v0.6.9"><meta data-vue-tag="true" data-key="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta data-vue-tag="true" data-key="format-detection" name="format-detection" content="telephone=no"><meta data-vue-tag="true" data-key="description" name="description" content="A simple blog to pen my findings and idk idk."><meta data-vue-tag="true" name="google-site-verification" content="sIbGxCmGnUobPKM6wa8WJZaHqfW7XJZP6WUEDaIo90o"><meta data-vue-tag="true" name="description" content><meta data-vue-tag="true" name="twitter:card" content="summary"><meta data-vue-tag="true" name="twitter:creator" content="@kvng_zeez"><meta data-vue-tag="true" name="twitter:description" content><meta data-vue-tag="true" name="twitter:image" content=""><meta data-vue-tag="true" name="twitter:site" content="@kvng_zeez"><meta data-vue-tag="true" property="og:type" content="article"><meta data-vue-tag="true" property="og:title" content="How To Build A Search Engine"><meta data-vue-tag="true" property="og:description" content><meta data-vue-tag="true" property="og:url" content="undefinedundefined"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Stylish&amp;display=swap"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans&amp;display=swap"><link data-vue-tag="true" rel="favicon" href="https://res.cloudinary.com/adeshina/image/upload/v1597158363/x8kh4xqni1ktuc4mb3v7.ico"><script data-vue-tag="true" src="https://platform.twitter.com/widgets.js" async="true"></script><noscript data-vue-tag="true" ><style>.g-image--loading{display:none;}</style></noscript><link rel="preload" href="/assets/css/0.styles.c31b00c3.css" as="style"><link rel="preload" href="/assets/js/app.972826c5.js" as="script"><link rel="preload" href="/assets/js/page--src--templates--post-vue.b31455b4.js" as="script"><link rel="prefetch" href="/assets/js/page--node-modules--gridsome--app--pages--404-vue.c976386a.js"><link rel="prefetch" href="/assets/js/page--src--pages--index-vue.801681a1.js"><link rel="prefetch" href="/assets/js/vendors~page--src--templates--post-vue.52a6764f.js"><link rel="stylesheet" href="/assets/css/0.styles.c31b00c3.css">
+  </head>
+  <body data-vue-tag="">
+    <div data-server-rendered="true" id="app" class="layout"><br><a id="go-back" aria-label="Go back" class="link">← Go Back</a><div class="post-title"><h1>How To Build A Search Engine</h1><p class="post-date"> 23 July 2023 | 8 min read</p></div><!----><div class="post-content"><p><p>A search engine is a program designed to retrieve information matching a supplied search term from a list of records or a database.</p>
+<p>A vertical search engine is a type of search engine designed for the retrieval of information specific to a particular niche. The vertical search engine is employed in information retrieval systems and differs from a horizontal search engine which is designed for a wider range of information.</p>
+<h2 id="components-of-a-search-engine"><a href="#components-of-a-search-engine" aria-hidden="true"><span class="icon icon-link"></span></a>Components of a search engine</h2>
+<p>A search engine ( and by extension, a vertical search engine ) comprises three components:</p>
+<ul>
+<li>crawler</li>
+<li>indexer</li>
+<li>query processor</li>
+</ul>
+<p>A search engine is dependent on the aforementioned components, which work hand-in-hand to provide specific functions. I’ve outlined briefly what the components do below:</p>
+<h3 id="crawler"><a href="#crawler" aria-hidden="true"><span class="icon icon-link"></span></a>Crawler</h3>
+<p>A crawler is responsible for pulling data from a defined source e.g. RSS feeds. This is usually the first operation a search engine program conducts - crawling data from defined sources. The data is crawled at given intervals which may sometimes be minutes, weeks or months.</p>
+<h3 id="query-processor"><a href="#query-processor" aria-hidden="true"><span class="icon icon-link"></span></a>Query Processor</h3>
+<p>This is the most significant operation in a search engine. A query processor is responsible for translating a term supplied to the search engine to return accurate results. We’re focused on preprocessing operations such:</p>
+<ul>
+<li>Tokenization: Split the text into individual words or tokens.</li>
+<li>Lowercasing: Convert all words to lowercase to ensure case-insensitive search.</li>
+<li>Removing stopwords: Filter out common words (e.g., "and," "the," "is") that do not contribute much to the meaning of the text.</li>
+<li>Stemming: Reduce words to their base or root form to improve search recall.</li>
+<li>Ranking: The ranking process involves assigning scores or weights to the documents based on factors like term frequency, inverse document frequency, and other relevancy measures.</li>
+</ul>
+<h3 id="indexer"><a href="#indexer" aria-hidden="true"><span class="icon icon-link"></span></a>Indexer</h3>
+<p>An indexer is responsible for storing data pulled by the crawler into a systematic order to allow for the easy location of data. The working principle of an indexer is to create an <strong>index</strong> which serves as a store for a collection of data as well as holding links to stored records - this is called indexing.</p>
+<h3 id="what-is-an-index"><a href="#what-is-an-index" aria-hidden="true"><span class="icon icon-link"></span></a>What is an index?</h3>
+<p>An index data structure is a system or method used to efficiently organize and retrieve information from a large dataset. It serves as a reference or roadmap that allows quick access to specific data elements, reducing the time complexity of searching and retrieval operations.</p>
+<p>In the context of text search and information retrieval, such as in databases or search engines, an index data structure is often used to facilitate fast searching of words, phrases, or other patterns within a corpus of documents. The index data structure typically consists of the following components:</p>
+<ol>
+<li><strong>Terms/Keys</strong>: These are the words or phrases from the documents that need to be indexed. Each unique term serves as a key in the index data structure.</li>
+<li><strong>Postings/Inverted Lists</strong>: For each term, there is a list of documents or locations where the term appears. This list is called a "posting" or "inverted list." The inverted list contains references to the documents or positions where the term occurs, enabling efficient retrieval of relevant documents during searches.</li>
+<li><strong>Term Frequencies</strong>: In some cases, the index may include information about the frequency of each term in a document. This can be used to rank the relevance of documents in search results or for other statistical purposes.</li>
+<li><strong>Document Information</strong>: Additional metadata about the documents, such as document IDs, titles, or other attributes, may be included in the index data structure for quicker identification and retrieval.</li>
+</ol>
+<p>The choice of the specific index data structure depends on the application and the requirements for search efficiency and space utilization. Common index data structures include:</p>
+<ul>
+<li><strong>Inverted Index</strong>: A widely used data structure for text search, where terms are mapped to their respective postings (lists of documents containing those terms).</li>
+<li><strong>B-trees</strong>: A balanced tree data structure commonly used for indexing in databases, providing efficient search, insert, and delete operations.</li>
+<li><strong>Hash Tables</strong>: Another data structure that enables fast key-based access to information, suitable for cases where exact matching is required.</li>
+</ul>
+<p>The design and implementation of an index data structure are crucial for optimizing search performance and providing a smooth user experience in various information retrieval systems.</p>
+<h2 id="building-the-search-engine"><a href="#building-the-search-engine" aria-hidden="true"><span class="icon icon-link"></span></a>Building the search engine</h2>
+<p>The operation of the search engine is: <strong>submit a query → process the query → return results</strong>. Remember that there are three components of the search engine explained in the previous section. <strong>In place of building an actual crawler, the indexer will be built on sample data generated by Faker. Let’s move on to build a query processor.</strong></p>
+<ul>
+<li>In this section, I’ll be focusing more on writing the actual code and less theory. The fundamental working principles of each of the functions involved have been discussed and will be summarily explained via code comments.</li>
+</ul>
+<h3 id="query-processor-1"><a href="#query-processor-1" aria-hidden="true"><span class="icon icon-link"></span></a>Query processor</h3>
+<p>The query processor will make use of the natural language toolkit library <code class="language-text">nltk</code> for word lemmatization and stopwords removal as well as necessary toolkit data <code class="language-text">punkt</code> for tokenization and <code class="language-text">wordnet</code> for, <code class="language-text">pickle</code> to serialize, save and load the inverted index into and from the inverted index file <code class="language-text">index</code>. </p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">import</span> nltk
+<span class="token keyword">import</span> pickle
+
+<span class="token keyword">from</span> collections <span class="token keyword">import</span> defaultdict
+<span class="token keyword">from</span> nltk<span class="token punctuation">.</span>stem <span class="token keyword">import</span> WordNetLemmatizer
+
+nltk<span class="token punctuation">.</span>download<span class="token punctuation">(</span><span class="token string">'punkt'</span><span class="token punctuation">)</span>
+nltk<span class="token punctuation">.</span>download<span class="token punctuation">(</span><span class="token string">'wordnet'</span><span class="token punctuation">)</span></code></pre></div>
+<h3 id="lemmatization"><a href="#lemmatization" aria-hidden="true"><span class="icon icon-link"></span></a>Lemmatization</h3>
+<p>Lemmatization is the process of reducing a word to its base form. For example, the word <code class="language-text">eating</code> when lemmatized is transformed to its base verb form <code class="language-text">eat</code>. This will be the first function defined in our search engine. The lemmatization will be carried out using nltk’s <code class="language-text">WordNetLemmatizer</code> method:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lemmatization</span><span class="token punctuation">(</span>word<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    lemmatizer <span class="token operator">=</span> WordNetLemmatizer<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    result <span class="token operator">=</span> lemmatizer<span class="token punctuation">.</span>lemmatize<span class="token punctuation">(</span>word<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> result</code></pre></div>
+<h3 id="tokenization-and-stopwords-removal"><a href="#tokenization-and-stopwords-removal" aria-hidden="true"><span class="icon icon-link"></span></a>Tokenization and stopwords removal</h3>
+<p>Let’s write out the function to handle the other tasks for the query processing. In this function, we’ll include the lemmatization function as well. Let’s call this function <code class="language-text">preprocess</code>:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">preprocess</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tokens <span class="token operator">=</span> nltk<span class="token punctuation">.</span>word_tokenize<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+
+    tokens <span class="token operator">=</span> <span class="token punctuation">[</span>lemmatization<span class="token punctuation">(</span>token<span class="token punctuation">)</span> <span class="token keyword">for</span> token <span class="token keyword">in</span> tokens<span class="token punctuation">]</span>
+
+    <span class="token comment"># Remove stopwords</span>
+    stopwords <span class="token operator">=</span> nltk<span class="token punctuation">.</span>corpus<span class="token punctuation">.</span>stopwords<span class="token punctuation">.</span>words<span class="token punctuation">(</span><span class="token string">"english"</span><span class="token punctuation">)</span>
+    tokens <span class="token operator">=</span> <span class="token punctuation">[</span>token <span class="token keyword">for</span> token <span class="token keyword">in</span> tokens <span class="token keyword">if</span> token <span class="token keyword">not</span> <span class="token keyword">in</span> stopwords<span class="token punctuation">]</span>
+
+    <span class="token comment"># Remove punctuation</span>
+    tokens <span class="token operator">=</span> <span class="token punctuation">[</span>token <span class="token keyword">for</span> token <span class="token keyword">in</span> tokens <span class="token keyword">if</span> token<span class="token punctuation">.</span>isalnum<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+    processed_text <span class="token operator">=</span> <span class="token string">" "</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> processed_text</code></pre></div>
+<p>The last functions involved in the processing is the ranking functions. These functions are responsible for calculating the relevance of the document to the given search query. For this search engine, we’ll make use of the <a href="https://www.capitalone.com/tech/machine-learning/understanding-tf-idf/" target="_blank" rel="nofollow noopener noreferrer">TF-IDF (Term Frequency-Inverse Document Frequency) formula</a>.</p>
+<p>The term frequency formula is defined as:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo separator="true">,</mo><mi>d</mi><mo stretchy="false">)</mo><mo>=</mo><mi>x</mi><mo>÷</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">TF(t,d) = x \div N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">d</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span></span>
+<p>where:</p>
+<ul>
+<li><strong><em>x</em></strong> is the number of times a term <em>t</em> appears in the document <strong>d</strong></li>
+<li><strong><em>N</em></strong> is the total number of terms in document <strong><em>d</em></strong></li>
+</ul>
+<p>The inverse document frequency formula is defined as:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>D</mi><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mo stretchy="false">(</mo><mi>N</mi><mo>÷</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">IDF(t) = log(N\div Y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">Y</span><span class="mclose">)</span></span></span></span></span>
+<p>where:</p>
+<ul>
+<li><strong><em>N</em></strong> is the total number of documents</li>
+<li><strong><em>Y</em></strong> is the number of documents containing term <strong><em>t</em></strong></li>
+</ul>
+<p>The combination TF-IDF formula is defined as:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>F</mi><mo>−</mo><mi>I</mi><mi>D</mi><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo separator="true">,</mo><mi>d</mi><mo stretchy="false">)</mo><mo>=</mo><mi>T</mi><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo separator="true">,</mo><mi>d</mi><mo stretchy="false">)</mo><mo>÷</mo><mi>I</mi><mi>D</mi><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">TF-IDF(t,d) = TF(t,d) \div IDF(t))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">d</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">d</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span>
+<p>Beneath the <code class="language-text">preprocess</code> function, let’s add the functions to calculate TF-IDF and IDF. The term frequency will be computed in the search function when a query is supplied. In the meantime, the functions are defined:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">import</span> math
+
+<span class="token operator">**</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">**</span> 
+
+<span class="token keyword">def</span> <span class="token function">calculate_tf_idf</span><span class="token punctuation">(</span>tf<span class="token punctuation">,</span> idf<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> tf <span class="token operator">*</span> idf
+
+<span class="token keyword">def</span> <span class="token function">calculate_idf</span><span class="token punctuation">(</span>word<span class="token punctuation">,</span> inverted_index<span class="token punctuation">,</span> total_docs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    doc_frequency <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>inverted_index<span class="token punctuation">[</span>word<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> doc_frequency <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">0</span>
+    <span class="token keyword">return</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span>total_docs <span class="token operator">/</span> doc_frequency<span class="token punctuation">)</span></code></pre></div>
+<h3 id="indexing"><a href="#indexing" aria-hidden="true"><span class="icon icon-link"></span></a>Indexing</h3>
+<p>The index is built from an existing chunk of document. For this article, I have collected sample data generated via Faker. </p>
+<p>Let’s start by writing a function to load the documents:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">load_documents</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    documents <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"text_documents.txt"</span><span class="token punctuation">,</span> <span class="token string">"r"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+        <span class="token keyword">for</span> line <span class="token keyword">in</span> f<span class="token punctuation">:</span>
+            documents<span class="token punctuation">.</span>append<span class="token punctuation">(</span>line<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> documents</code></pre></div>
+<p>Next, let’s write the function to build the inverted index and saved the index into a file <code class="language-text">index</code>:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">build_inverted_index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    inverted_index <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span><span class="token builtin">list</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> doc_id<span class="token punctuation">,</span> doc <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>documents<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        processed_doc <span class="token operator">=</span> preprocess<span class="token punctuation">(</span>doc<span class="token punctuation">)</span>
+        words <span class="token operator">=</span> processed_doc<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> word <span class="token keyword">in</span> words<span class="token punctuation">:</span>
+            inverted_index<span class="token punctuation">[</span>word<span class="token punctuation">]</span><span class="token punctuation">.</span>append<span class="token punctuation">(</span>doc_id<span class="token punctuation">)</span>
+
+    <span class="token comment"># Save the inverted index to a file named 'index'</span>
+    <span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">'index'</span><span class="token punctuation">,</span> <span class="token string">'wb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token builtin">file</span><span class="token punctuation">:</span>
+        pickle<span class="token punctuation">.</span>dump<span class="token punctuation">(</span>inverted_index<span class="token punctuation">,</span> <span class="token builtin">file</span><span class="token punctuation">)</span></code></pre></div>
+<h3 id="search-engine--results"><a href="#search-engine--results" aria-hidden="true"><span class="icon icon-link"></span></a>Search engine &#x26; results</h3>
+<p>Here, we combine all the components into one function:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">load_inverted_index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">'index'</span><span class="token punctuation">,</span> <span class="token string">'rb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token builtin">file</span><span class="token punctuation">:</span>
+        inverted_index <span class="token operator">=</span> pickle<span class="token punctuation">.</span>load<span class="token punctuation">(</span><span class="token builtin">file</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> inverted_index
+
+<span class="token keyword">def</span> <span class="token function">search</span><span class="token punctuation">(</span>query<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    documents <span class="token operator">=</span> load_documents<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    inverted_index <span class="token operator">=</span> load_inverted_index<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    total_docs <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>documents<span class="token punctuation">)</span>
+    query_words <span class="token operator">=</span> preprocess<span class="token punctuation">(</span>query<span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    scores <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span><span class="token builtin">float</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> word <span class="token keyword">in</span> query_words<span class="token punctuation">:</span>
+        idf <span class="token operator">=</span> calculate_idf<span class="token punctuation">(</span>word<span class="token punctuation">,</span> inverted_index<span class="token punctuation">,</span> total_docs<span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> doc_id <span class="token keyword">in</span> inverted_index<span class="token punctuation">[</span>word<span class="token punctuation">]</span><span class="token punctuation">:</span>
+            tf_doc <span class="token operator">=</span> documents<span class="token punctuation">[</span>doc_id<span class="token punctuation">]</span><span class="token punctuation">.</span>count<span class="token punctuation">(</span>word<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>documents<span class="token punctuation">[</span>doc_id<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            tf_idf_score <span class="token operator">=</span> calculate_tf_idf<span class="token punctuation">(</span>tf_doc<span class="token punctuation">,</span> idf<span class="token punctuation">)</span>
+            scores<span class="token punctuation">[</span>doc_id<span class="token punctuation">]</span> <span class="token operator">+=</span> tf_idf_score
+
+    ranked_docs <span class="token operator">=</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span>scores<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token keyword">lambda</span> x<span class="token punctuation">:</span> x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> reverse<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+
+    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>documents<span class="token punctuation">[</span>doc_id<span class="token punctuation">]</span><span class="token punctuation">,</span> score<span class="token punctuation">)</span> <span class="token keyword">for</span> doc_id<span class="token punctuation">,</span> score <span class="token keyword">in</span> ranked_docs<span class="token punctuation">]</span>
+
+    <span class="token keyword">return</span> result</code></pre></div>
+<p>The first function above is the <code class="language-text">load_inverted_index()</code> which loads the inverted index data stored in the <code class="language-text">index</code> file by <code class="language-text">pickle</code>.</p>
+<p>In the <code class="language-text">search</code> function, the documents and inverted index are loaded from their respective locations. The query word supplied is preprocessed and a new dictionary <code class="language-text">scores</code> is created to hold the scores of the terms contained in the query.</p>
+<p>In the <code class="language-text">for</code> loop, each word in the query gets its IDF calculated first. A child loop is included where the term frequency, inverse document frequency and the tf-idf score is computed and stored for each document contained in the reverse index.</p>
+<ul>
+<li>A reverse index is a comprehensive table that includes every word present in the corpus. For each word, it contains a record of the documents in which the word is found.</li>
+</ul>
+<p>Once the calculations are complete, the documents are ranked in descending based on the relevance score computed in the child for loop, and the results returned.</p>
+<p>An example usage for a query “politics” returned:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'Because many remain politics tonight none politics inside.'</span><span class="token punctuation">,</span> <span class="token number">0.3046288244472518</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+ <span class="token punctuation">(</span><span class="token string">'Billion cultural they politics that.'</span><span class="token punctuation">,</span> <span class="token number">0.12269772095792086</span><span class="token punctuation">)</span><span class="token punctuation">]</span></code></pre></div>
+<p>You can play with the search engine on this <a href="https://replit.com/@Youngestdev/Search-Engine" target="_blank" rel="nofollow noopener noreferrer">Replit</a>.</p>
+<h2 id="conclusion"><a href="#conclusion" aria-hidden="true"><span class="icon icon-link"></span></a>Conclusion</h2>
+<p>This is a simple exposé on how to build a simple search engine from scratch. The steps followed in this blog post covers the elementary procedures involved in building a search engine and can be modified further depending on the use case.</p>
+<p>If you’re feeling adventurous, attach this search engine to a framework and build a functional UI for it. As a bonus, improve the schema to make it work like the Google search engine - link, summary, etc.</p>
+<h2 id="notes"><a href="#notes" aria-hidden="true"><span class="icon icon-link"></span></a>Notes</h2>
+<ul>
+<li>There are a number of libraries for building search engine. The one I’ve worked with is <a href="https://whoosh.readthedocs.io/en/latest/quickstart.html" target="_blank" rel="nofollow noopener noreferrer">whoosh</a>. Whoosh makes indexing a seamless task ( it supports indexing directly to the RAM!).</li>
+<li>The functions in this blog post can be cleaned and optimized further.</li>
+<li>Some sections were further generated from GPT and the reverse index was paraphrased from whoosh’s <a href="https://whoosh.readthedocs.io/en/latest/glossary.html" target="_blank" rel="nofollow noopener noreferrer">glossary</a>.</li>
+<li>There are more components and technicalities involved in building a more robust search engine.</li>
+</ul>
+</p><hr><div id="disqus_thread"></div></div><div class="footer"><p>
+      Check my <a href="//github.com/Youngestdev" class="link">GitHub</a></p></div></div>
+    <script src="/assets/js/app.972826c5.js" defer></script><script src="/assets/js/page--src--templates--post-vue.b31455b4.js" defer></script>
+  </body>
+</html>

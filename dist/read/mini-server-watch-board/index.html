@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html data-html-server-rendered="true" lang="en" data-vue-tag="lang">
+  <head>
+    <title data-vue-tag="true">Mini Server Watch Board - Abdul&#x27;s Musings</title><meta data-vue-tag="true" charset="utf-8"><meta data-vue-tag="true" name="generator" content="Gridsome v0.6.9"><meta data-vue-tag="true" data-key="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta data-vue-tag="true" data-key="format-detection" name="format-detection" content="telephone=no"><meta data-vue-tag="true" data-key="description" name="description" content="A simple blog to pen my findings and idk idk."><meta data-vue-tag="true" name="google-site-verification" content="sIbGxCmGnUobPKM6wa8WJZaHqfW7XJZP6WUEDaIo90o"><meta data-vue-tag="true" name="description" content><meta data-vue-tag="true" name="twitter:card" content="summary"><meta data-vue-tag="true" name="twitter:creator" content="@kvng_zeez"><meta data-vue-tag="true" name="twitter:description" content><meta data-vue-tag="true" name="twitter:image" content=""><meta data-vue-tag="true" name="twitter:site" content="@kvng_zeez"><meta data-vue-tag="true" property="og:type" content="article"><meta data-vue-tag="true" property="og:title" content="Mini Server Watch Board"><meta data-vue-tag="true" property="og:description" content><meta data-vue-tag="true" property="og:url" content="undefinedundefined"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Stylish&amp;display=swap"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans&amp;display=swap"><link data-vue-tag="true" rel="favicon" href="https://res.cloudinary.com/adeshina/image/upload/v1597158363/x8kh4xqni1ktuc4mb3v7.ico"><script data-vue-tag="true" src="https://platform.twitter.com/widgets.js" async="true"></script><noscript data-vue-tag="true" ><style>.g-image--loading{display:none;}</style></noscript><link rel="preload" href="/assets/css/0.styles.c31b00c3.css" as="style"><link rel="preload" href="/assets/js/app.972826c5.js" as="script"><link rel="preload" href="/assets/js/page--src--templates--post-vue.b31455b4.js" as="script"><link rel="prefetch" href="/assets/js/page--node-modules--gridsome--app--pages--404-vue.c976386a.js"><link rel="prefetch" href="/assets/js/page--src--pages--index-vue.801681a1.js"><link rel="prefetch" href="/assets/js/vendors~page--src--templates--post-vue.52a6764f.js"><link rel="stylesheet" href="/assets/css/0.styles.c31b00c3.css">
+  </head>
+  <body data-vue-tag="">
+    <div data-server-rendered="true" id="app" class="layout"><br><a id="go-back" aria-label="Go back" class="link">← Go Back</a><div class="post-title"><h1>Mini Server Watch Board</h1><p class="post-date"> 14 February 2025 | 14 min read</p></div><!----><div class="post-content"><p><p>At <a href="https://thecodecafe.co" target="_blank" rel="nofollow noopener noreferrer">Codecafé</a>, we've been building a product which will be unveiled soon. For this product, I
+work as the lead <em>solo</em> backend engineer where I happen to have spent the last few months doing some interesting
+engineering work.</p>
+<blockquote>
+<p>Unfortunately, this blogpost isn't going to be detailed. It's basically a summary because I just wanted to write it.
+Hopefully someday when I have buttressed my knowledge, I can write more engineering focused articles.</p>
+</blockquote>
+<p>The development for our product is distributed among the founders and I happen to have so much free time, so my churn
+rate
+has been really high. Some weeks ago, I became curious and decided to build a monitoring dashboard in an attempt to see
+what's going on in the backend memory wise.</p>
+<p>The original idea was a dashboard where I can see the <strong>average</strong> time for a
+request. Locally, the requests are fast but what happens when we launch and have several users? We'll scale, I know.</p>
+<p>I had help with Claude (my first time using Claude and I think it's way better than GPT?) for the dashboard because I
+can't save my life writing anything frontend.</p>
+<h2 id="server-watch"><a href="#server-watch" aria-hidden="true"><span class="icon icon-link"></span></a>Server watch</h2>
+<p>The dashboard monitors the application's metrics such as request counts (and to what endpoints) and the memory usage.
+These classes are parent classes or should I call them the <strong>main utility</strong> classes. They're both used in another class
+<code class="language-text">EnhancedHealthCheck</code>, where the requests are tracked and the memory is properly analysed.</p>
+<blockquote>
+<p>The memory consumption monitored is basically due to database operations.</p>
+</blockquote>
+<h3 id="what-tool"><a href="#what-tool" aria-hidden="true"><span class="icon icon-link"></span></a>What tool?</h3>
+<p>Well, the key tool used is <a href="https://pypi.org/project/psutil/" target="_blank" rel="nofollow noopener noreferrer">psutil</a>. It's a library used to monitor systems and
+process management. I also made use of <code class="language-text">motor</code> for MongoDB database connection and FastAPI for defining a route to
+preview the dashboard.</p>
+<blockquote>
+<p>The first time I ran the code, I was really worried when I saw a 82% usage. Apparently, this was unrelated to the app
+and was a culmination of some processes altogether on my laptop. Huge relief.</p>
+</blockquote>
+<p>That's that, I'll get to it.</p>
+<h3 id="application-metrics"><a href="#application-metrics" aria-hidden="true"><span class="icon icon-link"></span></a>Application metrics</h3>
+<p>For the application metrics, I wanted to see what endpoints was visited the most. During development, I have a mental
+memory of the routes I visit a lot. I just wanted to have fun and see this in realtime.</p>
+<p>So, the class for mananging the metrics contained three methods:</p>
+<ol>
+<li>The <code class="language-text">add_error</code> which sustained a list of errors which had occured when using the application. 400s, 500s, etc.</li>
+<li>The <code class="language-text">get_average_response_time</code> which is the key method for me. This returned the average response time by diving the
+number of response times against the sum of the response times.... I think this is called <em>mean</em>. Oh, average.</li>
+<li>The <code class="language-text">get_error_rate</code> method which told me "Hey, be ashamed of yourself for all these errors!"</li>
+</ol>
+<p>All of these put into consideration and we have the class:</p>
+<div class="gridsome-highlight" data-language="py"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> psutil
+
+
+<span class="token keyword">class</span> <span class="token class-name">ApplicationMetrics</span><span class="token punctuation">:</span>
+	<span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+		self<span class="token punctuation">.</span>start_time <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+		self<span class="token punctuation">.</span>request_count <span class="token operator">=</span> <span class="token number">0</span>
+		self<span class="token punctuation">.</span>error_count <span class="token operator">=</span> <span class="token number">0</span>
+		self<span class="token punctuation">.</span>response_times <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+		self<span class="token punctuation">.</span>endpoints_usage <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+		self<span class="token punctuation">.</span>status_codes <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+		self<span class="token punctuation">.</span>last_errors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+		self<span class="token punctuation">.</span>max_stored_errors <span class="token operator">=</span> <span class="token number">10</span>
+
+	<span class="token keyword">def</span> <span class="token function">add_error</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> error<span class="token punctuation">:</span> Dict<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">,</span> Any<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+		self<span class="token punctuation">.</span>last_errors<span class="token punctuation">.</span>insert<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> error<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>last_errors<span class="token punctuation">)</span> <span class="token operator">></span> self<span class="token punctuation">.</span>max_stored_errors<span class="token punctuation">:</span>
+			self<span class="token punctuation">.</span>last_errors<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">def</span> <span class="token function">get_average_response_time</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">float</span><span class="token punctuation">:</span>
+		<span class="token keyword">if</span> <span class="token keyword">not</span> self<span class="token punctuation">.</span>response_times<span class="token punctuation">:</span>
+			<span class="token keyword">return</span> <span class="token number">0</span>
+		<span class="token keyword">return</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>response_times<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>response_times<span class="token punctuation">)</span>
+
+	<span class="token keyword">def</span> <span class="token function">get_error_rate</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">float</span><span class="token punctuation">:</span>
+		<span class="token keyword">if</span> self<span class="token punctuation">.</span>request_count <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+			<span class="token keyword">return</span> <span class="token number">0</span>
+		<span class="token keyword">return</span> <span class="token punctuation">(</span>self<span class="token punctuation">.</span>error_count <span class="token operator">/</span> self<span class="token punctuation">.</span>request_count<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span></code></pre></div>
+<h3 id="memory-analytics"><a href="#memory-analytics" aria-hidden="true"><span class="icon icon-link"></span></a>Memory analytics</h3>
+<p>I made use of <code class="language-text">psutil</code> here. The methods:</p>
+<ol>
+<li><code class="language-text">get_process_memory_details()</code> does as it's named. It returns a detailed memory usage for the current process. For
+example, process A is handled by an endpoint, it returns that.</li>
+<li><code class="language-text">get_system_memory_details()</code> was the method that made me panic because it was reading all system-wide info
+initially.</li>
+</ol>
+<div class="gridsome-highlight" data-language="py"><pre class="language-py"><code class="language-py"><span class="token keyword">class</span> <span class="token class-name">MemoryAnalytics</span><span class="token punctuation">:</span>
+	<span class="token decorator annotation punctuation">@staticmethod</span>
+	<span class="token keyword">def</span> <span class="token function">get_process_memory_details</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> Dict<span class="token punctuation">:</span>
+		process <span class="token operator">=</span> psutil<span class="token punctuation">.</span>Process<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+		memory_info <span class="token operator">=</span> process<span class="token punctuation">.</span>memory_info<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+		threads_memory <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+		<span class="token keyword">for</span> thread <span class="token keyword">in</span> process<span class="token punctuation">.</span>threads<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+			<span class="token keyword">try</span><span class="token punctuation">:</span>
+				thread_proc <span class="token operator">=</span> psutil<span class="token punctuation">.</span>Process<span class="token punctuation">(</span>thread<span class="token punctuation">.</span><span class="token builtin">id</span><span class="token punctuation">)</span>
+				threads_memory<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span>
+					<span class="token string">'thread_id'</span><span class="token punctuation">:</span> thread<span class="token punctuation">.</span><span class="token builtin">id</span><span class="token punctuation">,</span>
+					<span class="token string">'memory_info'</span><span class="token punctuation">:</span> thread_proc<span class="token punctuation">.</span>memory_info<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>_asdict<span class="token punctuation">(</span><span class="token punctuation">)</span>
+				<span class="token punctuation">}</span><span class="token punctuation">)</span>
+			<span class="token keyword">except</span> <span class="token punctuation">(</span>psutil<span class="token punctuation">.</span>NoSuchProcess<span class="token punctuation">,</span> psutil<span class="token punctuation">.</span>AccessDenied<span class="token punctuation">)</span><span class="token punctuation">:</span>
+				<span class="token keyword">continue</span>
+
+		<span class="token keyword">return</span> <span class="token punctuation">{</span>
+			<span class="token string">'process'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+				<span class="token string">'pid'</span><span class="token punctuation">:</span> process<span class="token punctuation">.</span>pid<span class="token punctuation">,</span>
+				<span class="token string">'memory_percent'</span><span class="token punctuation">:</span> process<span class="token punctuation">.</span>memory_percent<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">'memory_info'</span><span class="token punctuation">:</span> memory_info<span class="token punctuation">.</span>_asdict<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">'num_threads'</span><span class="token punctuation">:</span> process<span class="token punctuation">.</span>num_threads<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">'open_files'</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>process<span class="token punctuation">.</span>open_files<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">'connections'</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>process<span class="token punctuation">.</span>connections<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+			<span class="token punctuation">}</span><span class="token punctuation">,</span>
+			<span class="token string">'threads'</span><span class="token punctuation">:</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span>
+				threads_memory<span class="token punctuation">,</span>
+				key<span class="token operator">=</span><span class="token keyword">lambda</span> x<span class="token punctuation">:</span> x<span class="token punctuation">[</span><span class="token string">'memory_info'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'rss'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+				reverse<span class="token operator">=</span><span class="token boolean">True</span>
+			<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">5</span><span class="token punctuation">]</span>  <span class="token comment"># Top 5 memory consuming threads</span>
+		<span class="token punctuation">}</span>
+
+	<span class="token decorator annotation punctuation">@staticmethod</span>
+	<span class="token keyword">def</span> <span class="token function">get_system_memory_details</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> Dict<span class="token punctuation">:</span>
+		vm <span class="token operator">=</span> psutil<span class="token punctuation">.</span>virtual_memory<span class="token punctuation">(</span><span class="token punctuation">)</span>
+		swap <span class="token operator">=</span> psutil<span class="token punctuation">.</span>swap_memory<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+		<span class="token keyword">return</span> <span class="token punctuation">{</span>
+			<span class="token string">'virtual_memory'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+				<span class="token string">'total'</span><span class="token punctuation">:</span> vm<span class="token punctuation">.</span>total<span class="token punctuation">,</span>
+				<span class="token string">'available'</span><span class="token punctuation">:</span> vm<span class="token punctuation">.</span>available<span class="token punctuation">,</span>
+				<span class="token string">'used'</span><span class="token punctuation">:</span> vm<span class="token punctuation">.</span>used<span class="token punctuation">,</span>
+				<span class="token string">'free'</span><span class="token punctuation">:</span> vm<span class="token punctuation">.</span>free<span class="token punctuation">,</span>
+				<span class="token string">'percent'</span><span class="token punctuation">:</span> vm<span class="token punctuation">.</span>percent<span class="token punctuation">,</span>
+				<span class="token string">'active'</span><span class="token punctuation">:</span> <span class="token builtin">getattr</span><span class="token punctuation">(</span>vm<span class="token punctuation">,</span> <span class="token string">'active'</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">'inactive'</span><span class="token punctuation">:</span> <span class="token builtin">getattr</span><span class="token punctuation">(</span>vm<span class="token punctuation">,</span> <span class="token string">'inactive'</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">'buffers'</span><span class="token punctuation">:</span> <span class="token builtin">getattr</span><span class="token punctuation">(</span>vm<span class="token punctuation">,</span> <span class="token string">'buffers'</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">'cached'</span><span class="token punctuation">:</span> <span class="token builtin">getattr</span><span class="token punctuation">(</span>vm<span class="token punctuation">,</span> <span class="token string">'cached'</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">'shared'</span><span class="token punctuation">:</span> <span class="token builtin">getattr</span><span class="token punctuation">(</span>vm<span class="token punctuation">,</span> <span class="token string">'shared'</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span>
+			<span class="token punctuation">}</span><span class="token punctuation">,</span>
+			<span class="token string">'swap_memory'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+				<span class="token string">'total'</span><span class="token punctuation">:</span> swap<span class="token punctuation">.</span>total<span class="token punctuation">,</span>
+				<span class="token string">'used'</span><span class="token punctuation">:</span> swap<span class="token punctuation">.</span>used<span class="token punctuation">,</span>
+				<span class="token string">'free'</span><span class="token punctuation">:</span> swap<span class="token punctuation">.</span>free<span class="token punctuation">,</span>
+				<span class="token string">'percent'</span><span class="token punctuation">:</span> swap<span class="token punctuation">.</span>percent<span class="token punctuation">,</span>
+				<span class="token string">'sin'</span><span class="token punctuation">:</span> swap<span class="token punctuation">.</span>sin<span class="token punctuation">,</span>
+				<span class="token string">'sout'</span><span class="token punctuation">:</span> swap<span class="token punctuation">.</span>sout
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span></code></pre></div>
+<h2 id="now-what"><a href="#now-what" aria-hidden="true"><span class="icon icon-link"></span></a>Now, what?</h2>
+<p>Well. These are skeletal classes that needs to be plugged somewhere or made use of. The <code class="language-text">EnhancedHealthCheck</code> contains
+methods that dealt with time formatting, listening to requests to track them down, take a memory source to monitor (the
+<code class="language-text">__init__</code> method), etc.</p>
+<div class="gridsome-highlight" data-language="py"><pre class="language-py"><code class="language-py"><span class="token keyword">class</span> <span class="token class-name">EnhancedHealthCheck</span><span class="token punctuation">:</span>
+	<span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> app<span class="token punctuation">:</span> FastAPI<span class="token punctuation">,</span> db_client<span class="token punctuation">:</span> AsyncIOMotorClient<span class="token punctuation">)</span><span class="token punctuation">:</span>
+		self<span class="token punctuation">.</span>app <span class="token operator">=</span> app
+		self<span class="token punctuation">.</span>db_client <span class="token operator">=</span> db_client
+		self<span class="token punctuation">.</span>start_time <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+		self<span class="token punctuation">.</span>metrics <span class="token operator">=</span> ApplicationMetrics<span class="token punctuation">(</span><span class="token punctuation">)</span>
+		self<span class="token punctuation">.</span>memory_analytics <span class="token operator">=</span> MemoryAnalytics<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">def</span> <span class="token function">format_uptime</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> seconds<span class="token punctuation">:</span> <span class="token builtin">float</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">str</span><span class="token punctuation">:</span>
+		days <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>seconds <span class="token operator">//</span> <span class="token punctuation">(</span><span class="token number">24</span> <span class="token operator">*</span> <span class="token number">3600</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		seconds <span class="token operator">=</span> seconds <span class="token operator">%</span> <span class="token punctuation">(</span><span class="token number">24</span> <span class="token operator">*</span> <span class="token number">3600</span><span class="token punctuation">)</span>
+		hours <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>seconds <span class="token operator">//</span> <span class="token number">3600</span><span class="token punctuation">)</span>
+		seconds <span class="token operator">%=</span> <span class="token number">3600</span>
+		minutes <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>seconds <span class="token operator">//</span> <span class="token number">60</span><span class="token punctuation">)</span>
+		seconds <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>seconds <span class="token operator">%</span> <span class="token number">60</span><span class="token punctuation">)</span>
+
+		parts <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+		<span class="token keyword">if</span> days <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+			parts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>days<span class="token punctuation">}</span></span><span class="token string">d"</span></span><span class="token punctuation">)</span>
+		<span class="token keyword">if</span> hours <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+			parts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>hours<span class="token punctuation">}</span></span><span class="token string">h"</span></span><span class="token punctuation">)</span>
+		<span class="token keyword">if</span> minutes <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+			parts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>minutes<span class="token punctuation">}</span></span><span class="token string">m"</span></span><span class="token punctuation">)</span>
+		parts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>seconds<span class="token punctuation">}</span></span><span class="token string">s"</span></span><span class="token punctuation">)</span>
+
+		<span class="token keyword">return</span> <span class="token string">" "</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>parts<span class="token punctuation">)</span>
+
+	<span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">track_request_metrics</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> request<span class="token punctuation">:</span> Request<span class="token punctuation">,</span> call_next<span class="token punctuation">)</span><span class="token punctuation">:</span>
+		start_time <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">try</span><span class="token punctuation">:</span>
+			response <span class="token operator">=</span> <span class="token keyword">await</span> call_next<span class="token punctuation">(</span>request<span class="token punctuation">)</span>
+
+			<span class="token comment"># Update metrics</span>
+			self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>request_count <span class="token operator">+=</span> <span class="token number">1</span>
+			response_time <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> start_time
+			self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>response_times<span class="token punctuation">.</span>append<span class="token punctuation">(</span>response_time<span class="token punctuation">)</span>
+
+			<span class="token comment"># Track endpoint usage</span>
+			endpoint <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>request<span class="token punctuation">.</span>method<span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>request<span class="token punctuation">.</span>url<span class="token punctuation">.</span>path<span class="token punctuation">}</span></span><span class="token string">"</span></span>
+			self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>endpoints_usage<span class="token punctuation">[</span>endpoint<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>
+				self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>endpoints_usage<span class="token punctuation">.</span>get<span class="token punctuation">(</span>endpoint<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span>
+			<span class="token punctuation">)</span>
+
+			<span class="token comment"># Track status codes</span>
+			self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>status_codes<span class="token punctuation">[</span>response<span class="token punctuation">.</span>status_code<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>
+				self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>status_codes<span class="token punctuation">.</span>get<span class="token punctuation">(</span>response<span class="token punctuation">.</span>status_code<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span>
+			<span class="token punctuation">)</span>
+
+			<span class="token keyword">return</span> response
+		<span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+			self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>error_count <span class="token operator">+=</span> <span class="token number">1</span>
+			self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>add_error<span class="token punctuation">(</span><span class="token punctuation">{</span>
+				<span class="token string">"timestamp"</span><span class="token punctuation">:</span> datetime<span class="token punctuation">.</span>now<span class="token punctuation">(</span>timezone<span class="token punctuation">.</span>utc<span class="token punctuation">)</span><span class="token punctuation">.</span>strftime<span class="token punctuation">(</span><span class="token string">"%Y-%m-%d %H:%M:%S UTC"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">"endpoint"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>request<span class="token punctuation">.</span>method<span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>request<span class="token punctuation">.</span>url<span class="token punctuation">.</span>path<span class="token punctuation">}</span></span><span class="token string">"</span></span>
+			<span class="token punctuation">}</span><span class="token punctuation">)</span>
+			<span class="token keyword">raise</span>
+
+	<span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">get_detailed_health</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> request<span class="token punctuation">:</span> Request<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> Dict<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">,</span> Any<span class="token punctuation">]</span><span class="token punctuation">:</span>
+		uptime_seconds <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>start_time
+
+		<span class="token comment"># Check database connection</span>
+		<span class="token keyword">try</span><span class="token punctuation">:</span>
+			<span class="token keyword">await</span> self<span class="token punctuation">.</span>db_client<span class="token punctuation">.</span>server_info<span class="token punctuation">(</span><span class="token punctuation">)</span>
+			db_status <span class="token operator">=</span> <span class="token string">"healthy"</span>
+		<span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+			db_status <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"error: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">str</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span>
+
+		memory_analysis <span class="token operator">=</span> <span class="token punctuation">{</span>
+			<span class="token string">'process'</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>memory_analytics<span class="token punctuation">.</span>get_process_memory_details<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+			<span class="token string">'system'</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>memory_analytics<span class="token punctuation">.</span>get_system_memory_details<span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token punctuation">}</span>
+
+		<span class="token keyword">return</span> <span class="token punctuation">{</span>
+			<span class="token string">"status"</span><span class="token punctuation">:</span> <span class="token string">"healthy"</span> <span class="token keyword">if</span> db_status <span class="token operator">==</span> <span class="token string">"healthy"</span> <span class="token keyword">else</span> <span class="token string">"unhealthy"</span><span class="token punctuation">,</span>
+			<span class="token string">"uptime"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+				<span class="token string">"seconds"</span><span class="token punctuation">:</span> uptime_seconds<span class="token punctuation">,</span>
+				<span class="token string">"formatted"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>format_uptime<span class="token punctuation">(</span>uptime_seconds<span class="token punctuation">)</span>
+			<span class="token punctuation">}</span><span class="token punctuation">,</span>
+			<span class="token string">"database"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+				<span class="token string">"status"</span><span class="token punctuation">:</span> db_status
+			<span class="token punctuation">}</span><span class="token punctuation">,</span>
+			<span class="token string">"memory_analysis"</span><span class="token punctuation">:</span> memory_analysis<span class="token punctuation">,</span>
+			<span class="token string">"application"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+				<span class="token string">"total_requests"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>request_count<span class="token punctuation">,</span>
+				<span class="token string">"error_count"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>error_count<span class="token punctuation">,</span>
+				<span class="token string">"error_rate"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>get_error_rate<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">"average_response_time"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>get_average_response_time<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">"status_codes"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>status_codes<span class="token punctuation">,</span>
+				<span class="token string">"endpoints"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>endpoints_usage<span class="token punctuation">,</span>
+				<span class="token string">"recent_errors"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>last_errors
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span></code></pre></div>
+<p>The last method is the <code class="language-text">get_dashboard_html()</code> method from Claude. I can't explain it but it's a beautiful one. AI is a
+good companion o. Can they work on one that'll generate mockups or smtn in Figma? I need that urgently!</p>
+<p>The <code class="language-text">get_dashboard_html()</code> is defined as:</p>
+<div class="gridsome-highlight" data-language="py"><pre class="language-py"><code class="language-py"><span class="token keyword">def</span> <span class="token function">get_dashboard_html</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">str</span><span class="token punctuation">:</span>
+	<span class="token keyword">return</span> <span class="token triple-quoted-string string">"""
+&lt;!DOCTYPE html>
+&lt;html>
+   &lt;head>
+      &lt;title>Enhanced Server Status Dashboard&lt;/title>
+      &lt;script src="https://cdn.jsdelivr.net/npm/chart.js">&lt;/script>
+      &lt;style>
+         body {
+         font-family: Arial, sans-serif;
+         margin: 20px;
+         background-color: #f5f5f5;
+         padding-bottom: 40px;
+         }
+         .grid {
+         display: grid;
+         grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+         gap: 20px;
+         }
+         .card {
+         border: 1px solid #ddd;
+         border-radius: 8px;
+         padding: 15px;
+         background: white;
+         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+         }
+         .metric-value {
+         font-size: 24px;
+         font-weight: bold;
+         color: #2c3e50;
+         }
+         .metric-label {
+         color: #7f8c8d;
+         font-size: 14px;
+         }
+         .healthy { color: #27ae60; }
+         .warning { color: #f39c12; }
+         .error { color: #c0392b; }
+         .refresh-btn {
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         padding: 10px 20px;
+         background-color: #4CAF50;
+         color: white;
+         border: none;
+         border-radius: 4px;
+         cursor: pointer;
+         z-index: 1000;
+         transition: background-color 0.3s ease;
+         }
+         .refresh-btn:hover {
+         background-color: #45a049;
+         }
+         .refresh-btn:active {
+         transform: scale(0.98);
+         }
+         .last-updated {
+         position: fixed;
+         top: 60px;
+         right: 20px;
+         color: #666;
+         font-size: 12px;
+         z-index: 1000;
+         }
+         .header {
+         margin-bottom: 20px;
+         padding-right: 200px;
+         }
+         .memory-bar {
+         width: 100%;
+         height: 24px;
+         background: #f0f0f0;
+         border-radius: 4px;
+         overflow: hidden;
+         margin: 10px 0;
+         display: flex;
+         }
+         .bar-segment {
+         height: 100%;
+         display: inline-block;
+         text-align: center;
+         color: white;
+         font-size: 12px;
+         line-height: 24px;
+         }
+         .bar-segment.used {
+         background-color: #ff6b6b;
+         }
+         .bar-segment.cached {
+         background-color: #4ecdc4;
+         }
+         .bar-segment.free {
+         background-color: #95a5a6;
+         }
+         .memory-details, .memory-stats {
+         font-size: 14px;
+         margin: 10px 0;
+         }
+         .thread-list {
+         max-height: 200px;
+         overflow-y: auto;
+         }
+         .thread-item {
+         padding: 5px;
+         border-bottom: 1px solid #eee;
+         }
+         .error-item {
+         margin-bottom: 10px;
+         padding: 8px;
+         border-left: 4px solid #c0392b;
+         background-color: #fef2f2;
+         }
+         .error-item strong {
+         color: #c0392b;
+         }
+      &lt;/style>
+   &lt;/head>
+   &lt;body>
+      &lt;div class="header">
+         &lt;h1>Enhanced Server Status Dashboard&lt;/h1>
+      &lt;/div>
+      &lt;button class="refresh-btn" id="refresh-dashboard">
+      Refresh Dashboard
+      &lt;/button>
+      &lt;div class="last-updated" id="last-updated">&lt;/div>
+      &lt;div class="grid">
+         &lt;div class="card">
+            &lt;h2>System Overview&lt;/h2>
+            &lt;div id="system-overview">&lt;/div>
+         &lt;/div>
+         &lt;div class="card">
+            &lt;h2>Resource Usage&lt;/h2>
+            &lt;canvas id="resourceChart">&lt;/canvas>
+         &lt;/div>
+         &lt;div class="card">
+            &lt;h2>Memory Analysis&lt;/h2>
+            &lt;div id="memory-analysis">&lt;/div>
+         &lt;/div>
+         &lt;div class="card">
+            &lt;h2>Application Metrics&lt;/h2>
+            &lt;div id="app-metrics">&lt;/div>
+         &lt;/div>
+         &lt;div class="card">
+            &lt;h2>Recent Errors&lt;/h2>
+            &lt;div id="recent-errors">&lt;/div>
+         &lt;/div>
+         &lt;div class="card">
+            &lt;h2>Endpoint Usage&lt;/h2>
+            &lt;canvas id="endpointChart">&lt;/canvas>
+         &lt;/div>
+      &lt;/div>
+      &lt;script>
+         let dashboardActive = true;
+         let updateInterval;
+         let isUpdating = false;  // Flag to prevent multiple simultaneous updates
+
+         function formatBytes(bytes, decimals = 2) {
+         if (bytes === 0) return '0 Bytes';
+         const k = 1024;
+         const dm = decimals &lt; 0 ? 0 : decimals;
+         const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+         const i = Math.floor(Math.log(bytes) / Math.log(k));
+         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+         }
+
+         async function updateDashboard() {
+         if (isUpdating) return;  // Prevent multiple simultaneous updates
+         isUpdating = true;
+
+         try {
+         const response = await fetch('/api/v1/health');
+         const data = await response.json();
+
+         // Update system overview
+         document.getElementById('system-overview').innerHTML = `
+         &lt;div class="metric">
+         &lt;div class="metric-value ${data.status}">${data.status}&lt;/div>
+         &lt;div class="metric-label">Status&lt;/div>
+         &lt;/div>
+         &lt;div class="metric">
+         &lt;div class="metric-value">${data.uptime.formatted}&lt;/div>
+         &lt;div class="metric-label">Uptime&lt;/div>
+         &lt;/div>
+         `;
+
+         // Update application metrics
+         document.getElementById('app-metrics').innerHTML = `
+         &lt;div class="metric">
+         &lt;div class="metric-value">${data.application.total_requests}&lt;/div>
+         &lt;div class="metric-label">Total Requests&lt;/div>
+         &lt;/div>
+         &lt;div class="metric">
+         &lt;div class="metric-value">${data.application.error_rate.toFixed(2)}%&lt;/div>
+         &lt;div class="metric-label">Error Rate&lt;/div>
+         &lt;/div>
+         &lt;div class="metric">
+         &lt;div class="metric-value">${data.application.average_response_time}s&lt;/div>
+         &lt;div class="metric-label">Avg Response Time&lt;/div>
+         &lt;/div>
+         `;
+
+         // Update memory analysis
+         const memoryAnalysis = document.getElementById('memory-analysis');
+         const memData = data.memory_analysis;
+
+         memoryAnalysis.innerHTML = `
+         &lt;h3>Process Memory&lt;/h3>
+         &lt;div class="memory-metric">
+         &lt;div class="metric-value">${memData.process.process.memory_percent.toFixed(2)}%&lt;/div>
+         &lt;div class="metric-label">Process Memory Usage&lt;/div>
+         &lt;/div>
+         &lt;div class="memory-details">
+         &lt;p>RSS: ${formatBytes(memData.process.process.memory_info.rss)}&lt;/p>
+         &lt;p>VMS: ${formatBytes(memData.process.process.memory_info.vms)}&lt;/p>
+         &lt;p>Threads: ${memData.process.process.num_threads}&lt;/p>
+         &lt;p>Open Files: ${memData.process.process.open_files}&lt;/p>
+         &lt;/div>
+
+         &lt;h3>System Memory&lt;/h3>
+         &lt;div class="memory-system">
+         &lt;div class="memory-bar">
+         &lt;div class="bar-segment used"
+         style="width: ${memData.system.virtual_memory.percent}%">
+         Used (${memData.system.virtual_memory.percent}%)
+         &lt;/div>
+         &lt;div class="bar-segment cached"
+         style="width: ${(memData.system.virtual_memory.cached || 0) / memData.system.virtual_memory.total * 100}%">
+         Cached
+         &lt;/div>
+         &lt;div class="bar-segment free"
+         style="width: ${100 - memData.system.virtual_memory.percent}%">
+         Free
+         &lt;/div>
+         &lt;/div>
+         &lt;div class="memory-stats">
+         &lt;p>Total: ${formatBytes(memData.system.virtual_memory.total)}&lt;/p>
+         &lt;p>Available: ${formatBytes(memData.system.virtual_memory.available)}&lt;/p>
+         &lt;p>Used: ${formatBytes(memData.system.virtual_memory.used)}&lt;/p>
+         &lt;p>Cached: ${formatBytes(memData.system.virtual_memory.cached || 0)}&lt;/p>
+         &lt;/div>
+         &lt;/div>
+
+         &lt;h3>Top Memory Threads&lt;/h3>
+         &lt;div class="thread-list">
+         ${memData.process.threads.map(thread => `
+         &lt;div class="thread-item">
+         Thread ${thread.thread_id}: ${formatBytes(thread.memory_info.rss)}
+         &lt;/div>
+         `).join('')}
+         &lt;/div>
+         `;
+
+         // Update recent errors
+         document.getElementById('recent-errors').innerHTML =
+         data.application.recent_errors
+         .map(error => `
+         &lt;div class="error-item">
+         &lt;strong>${error.timestamp}&lt;/strong>
+         &lt;p>${error.error}&lt;/p>
+         &lt;small>${error.endpoint}&lt;/small>
+         &lt;/div>
+         `)
+         .join('');
+
+         // Update charts
+         updateResourceChart(data);
+         updateEndpointChart(data);
+
+         // Update last updated timestamp
+         updateLastUpdated();
+
+         } catch (error) {
+         console.error('Failed to update dashboard:', error);
+         } finally {
+         isUpdating = false;  // Reset the update flag
+         }
+         }
+
+         function updateResourceChart(data) {
+         const ctx = document.getElementById('resourceChart').getContext('2d');
+         const processData = data.memory_analysis.process.process;
+
+         new Chart(ctx, {
+         type: 'bar',
+         data: {
+         labels: ['Memory Usage', 'Threads', 'Open Files', 'Connections'],
+         datasets: [{
+         label: 'Mercury Process Metrics',
+         data: [
+         processData.memory_percent,
+         processData.num_threads,
+         processData.open_files,
+         processData.connections
+         ],
+         backgroundColor: [
+         'rgba(54, 162, 235, 0.2)',  // Memory
+         'rgba(255, 99, 132, 0.2)',   // Threads
+         'rgba(75, 192, 192, 0.2)',   // Files
+         'rgba(255, 206, 86, 0.2)'    // Connections
+         ],
+         borderColor: [
+         'rgba(54, 162, 235, 1)',
+         'rgba(255, 99, 132, 1)',
+         'rgba(75, 192, 192, 1)',
+         'rgba(255, 206, 86, 1)'
+         ],
+         borderWidth: 1
+         }]
+         },
+         options: {
+         responsive: true,
+         scales: {
+         y: {
+         beginAtZero: true,
+         title: {
+         display: true,
+         text: 'Count/Percentage'
+         }
+         }
+         },
+         plugins: {
+         title: {
+         display: true,
+         text: 'Mercury Process Resources'
+         },
+         tooltip: {
+         callbacks: {
+         label: function(context) {
+         const label = context.dataset.label || '';
+         const value = context.parsed.y;
+         if (context.dataIndex === 0) {
+         return `Memory: ${value.toFixed(2)}%`;
+         }
+         return `${context.label}: ${value}`;
+         }
+         }
+         }
+         }
+         }
+         });
+         }
+
+         function updateEndpointChart(data) {
+         const ctx = document.getElementById('endpointChart').getContext('2d');
+         const endpoints = Object.keys(data.application.endpoints);
+         const counts = Object.values(data.application.endpoints);
+
+         new Chart(ctx, {
+         type: 'pie',
+         data: {
+         labels: endpoints,
+         datasets: [{
+         data: counts,
+         backgroundColor: endpoints.map(() =>
+         `hsl(${Math.random() * 360}, 70%, 50%)`
+         )
+         }]
+         }
+         });
+         }
+
+         function updateLastUpdated() {
+         const now = new Date().toLocaleString();
+         document.getElementById('last-updated').textContent = `Last updated: ${now}`;
+         }
+
+         function startDashboardUpdates() {
+         dashboardActive = true;
+         updateDashboard();
+         updateInterval = setInterval(updateDashboard, 30000); // 30 seconds
+         }
+
+         function stopDashboardUpdates() {
+         dashboardActive = false;
+         if (updateInterval) {
+         clearInterval(updateInterval);
+         }
+         }
+
+         // Handle page visibility
+         document.addEventListener('visibilitychange', function() {
+         if (document.hidden) {
+         stopDashboardUpdates();
+         } else {
+         startDashboardUpdates();
+         }
+         });
+
+         // Handle refresh button click
+         document.addEventListener('DOMContentLoaded', function() {
+         document.getElementById('refresh-dashboard').addEventListener('click', function() {
+         updateDashboard();
+         });
+         });
+
+         // Initial load
+         startDashboardUpdates();
+      &lt;/script>
+   &lt;/body>
+&lt;/html>
+ """</span></code></pre></div>
+<h2 id="wrap-it-up"><a href="#wrap-it-up" aria-hidden="true"><span class="icon icon-link"></span></a>Wrap it up!</h2>
+<p>Since I needed this to work in my FastAPI application, I had it all wrapped up in a function so I can just make use of
+it in my main app:</p>
+<div class="gridsome-highlight" data-language="py"><pre class="language-py"><code class="language-py"><span class="token keyword">def</span> <span class="token function">setup_enhanced_health_routes</span><span class="token punctuation">(</span>app<span class="token punctuation">:</span> FastAPI<span class="token punctuation">,</span> db_client<span class="token punctuation">:</span> AsyncIOMotorClient<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+	health_checker <span class="token operator">=</span> EnhancedHealthCheck<span class="token punctuation">(</span>app<span class="token punctuation">,</span> db_client<span class="token punctuation">)</span>
+
+	<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>middleware</span><span class="token punctuation">(</span><span class="token string">"http"</span><span class="token punctuation">)</span>
+	<span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">metrics_middleware</span><span class="token punctuation">(</span>request<span class="token punctuation">:</span> Request<span class="token punctuation">,</span> call_next<span class="token punctuation">)</span><span class="token punctuation">:</span>
+		<span class="token keyword">return</span> <span class="token keyword">await</span> health_checker<span class="token punctuation">.</span>track_request_metrics<span class="token punctuation">(</span>request<span class="token punctuation">,</span> call_next<span class="token punctuation">)</span>
+
+	<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>get</span><span class="token punctuation">(</span><span class="token string">"/health"</span><span class="token punctuation">)</span>
+	<span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">health</span><span class="token punctuation">(</span>request<span class="token punctuation">:</span> Request<span class="token punctuation">)</span><span class="token punctuation">:</span>
+		<span class="token keyword">return</span> <span class="token keyword">await</span> health_checker<span class="token punctuation">.</span>get_detailed_health<span class="token punctuation">(</span>request<span class="token punctuation">)</span>
+
+	<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>get</span><span class="token punctuation">(</span><span class="token string">"/dashboard"</span><span class="token punctuation">,</span> response_class<span class="token operator">=</span>HTMLResponse<span class="token punctuation">)</span>
+	<span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">dashboard</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+		<span class="token keyword">return</span> health_checker<span class="token punctuation">.</span>get_dashboard_html<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre></div>
+<p>Here's how the dashboard looks:</p>
+<p><img src="https://i.ibb.co/DHcVKwvP/Screenshot-2025-02-14-at-23-27-02.png" alt="Dashboard"></p>
+<p>A database client is attached so I can monitor the I/O operations and know when to panic and when not to.</p>
+<h2 id="thanks"><a href="#thanks" aria-hidden="true"><span class="icon icon-link"></span></a>Thanks</h2>
+<p>Thanks to Claude, truly. I can't do it all and that's why we have them(LLMs).</p>
+<hr>
+</p><hr><div id="disqus_thread"></div></div><div class="footer"><p>
+      Check my <a href="//github.com/Youngestdev" class="link">GitHub</a></p></div></div>
+    <script src="/assets/js/app.972826c5.js" defer></script><script src="/assets/js/page--src--templates--post-vue.b31455b4.js" defer></script>
+  </body>
+</html>

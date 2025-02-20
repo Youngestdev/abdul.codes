@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html data-html-server-rendered="true" lang="en" data-vue-tag="lang">
+  <head>
+    <title data-vue-tag="true">Building a Treasure Hunter for an online graph maze. - Abdul&#x27;s Musings</title><meta data-vue-tag="true" charset="utf-8"><meta data-vue-tag="true" name="generator" content="Gridsome v0.6.9"><meta data-vue-tag="true" data-key="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta data-vue-tag="true" data-key="format-detection" name="format-detection" content="telephone=no"><meta data-vue-tag="true" data-key="description" name="description" content="A simple blog to pen my findings and idk idk."><meta data-vue-tag="true" name="google-site-verification" content="sIbGxCmGnUobPKM6wa8WJZaHqfW7XJZP6WUEDaIo90o"><meta data-vue-tag="true" name="description" content><meta data-vue-tag="true" name="twitter:card" content="summary"><meta data-vue-tag="true" name="twitter:creator" content="@kvng_zeez"><meta data-vue-tag="true" name="twitter:description" content><meta data-vue-tag="true" name="twitter:image" content=""><meta data-vue-tag="true" name="twitter:site" content="@kvng_zeez"><meta data-vue-tag="true" property="og:type" content="article"><meta data-vue-tag="true" property="og:title" content="Building a Treasure Hunter for an online graph maze."><meta data-vue-tag="true" property="og:description" content><meta data-vue-tag="true" property="og:url" content="undefinedundefined"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Stylish&amp;display=swap"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans&amp;display=swap"><link data-vue-tag="true" rel="favicon" href="https://res.cloudinary.com/adeshina/image/upload/v1597158363/x8kh4xqni1ktuc4mb3v7.ico"><script data-vue-tag="true" src="https://platform.twitter.com/widgets.js" async="true"></script><noscript data-vue-tag="true" ><style>.g-image--loading{display:none;}</style></noscript><link rel="preload" href="/assets/css/0.styles.c31b00c3.css" as="style"><link rel="preload" href="/assets/js/app.972826c5.js" as="script"><link rel="preload" href="/assets/js/page--src--templates--post-vue.b31455b4.js" as="script"><link rel="prefetch" href="/assets/js/page--node-modules--gridsome--app--pages--404-vue.c976386a.js"><link rel="prefetch" href="/assets/js/page--src--pages--index-vue.801681a1.js"><link rel="prefetch" href="/assets/js/vendors~page--src--templates--post-vue.52a6764f.js"><link rel="stylesheet" href="/assets/css/0.styles.c31b00c3.css">
+  </head>
+  <body data-vue-tag="">
+    <div data-server-rendered="true" id="app" class="layout"><br><a id="go-back" aria-label="Go back" class="link">← Go Back</a><div class="post-title"><h1>Building a Treasure Hunter for an online graph maze.</h1><p class="post-date"> 4 August 2020 | 7 min read</p></div><!----><div class="post-content"><p><blockquote>
+<p>I think this process is called "crawling", and that's the same approach every one use.. except well, some used recursion.</p>
+</blockquote>
+<p>The treasure hunt is an online graph maze with numerous endpoints from the test game having 50 to the last game having 5000 (+4 additional) nodes. There were about 250 participants in the online game and I came in second place - my code process died while I was fulfilling my <strong>Director General of Ram duties</strong> affairs. It was nice nontheless, aha!</p>
+<p>So, <a href="https://twitter.com/favourcodes" target="_blank" rel="nofollow noopener noreferrer">Favour</a> and I built this tool. I built the main process initially and we then brainstormed to add other features I'll discuss.</p>
+<p>You should check out the game here - [Find Treasure App]](<a href="https://findtreasure.app/" target="_blank" rel="nofollow noopener noreferrer">https://findtreasure.app/</a>)</p>
+<h2 id="process"><a href="#process" aria-hidden="true"><span class="icon icon-link"></span></a>Process</h2>
+<p>It's an online endpoint game so well, <em>GET</em> requests are flying about. I was opportuned to run the test game so I studied the response gotten.. I'll share in subsections the entire process.</p>
+<h3 id="initial-bootstrap"><a href="#initial-bootstrap" aria-hidden="true"><span class="icon icon-link"></span></a>Initial bootstrap</h3>
+<p>I haven't worked with python web libraries since my main focus has been to conquer DS &#x26; ALGOS. Fortunately, I was having difficulties understanding graph traversals so I used this online endpoint to practice and, it worked. The fastest I have traversed the test nodes is <strong>271</strong> seconds. Enough talk I think, I'll just dive in.</p>
+<p>So, first thing I did was check the Python <code class="language-text">requests</code> library and begin initial works:</p>
+<div class="gridsome-highlight" data-language="python"><pre style="counter-reset: linenumber 0" class="language-python line-numbers"><code class="language-python"><span class="token keyword">import</span> requests
+
+
+headers <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'gomoney'</span><span class="token punctuation">:</span> <span class="token string">'number'</span><span class="token punctuation">,</span>
+    <span class="token string">'Authorization'</span><span class="token punctuation">:</span> <span class="token string">'BEARER &lt;TOKEN>'</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">def</span> <span class="token function">FindTreasure</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    url <span class="token operator">=</span> <span class="token string">"https://findtreasure.app/api/v1/games/test/start"</span>
+    response <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>response<span class="token punctuation">)</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<p>That was basically the first thing I did, send a request and check it's response in JSON:</p>
+<div class="gridsome-highlight" data-language="json"><pre style="counter-reset: linenumber 0" class="language-json line-numbers"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"paths"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"https://findtreasure.app/api/v1/games/test/19d80a7b-a9e2-4637-a4e9-4de42aa35909"</span><span class="token punctuation">,</span>
+    <span class="token string">"https://findtreasure.app/api/v1/games/test/482a827b-5237-473d-93fa-9a6b4fa8078c"</span><span class="token punctuation">,</span>
+    <span class="token string">"https://findtreasure.app/api/v1/games/test/5935e776-fffd-4a57-be18-f2602621ea72"</span><span class="token punctuation">,</span>
+    <span class="token string">"https://findtreasure.app/api/v1/games/test/0b5cd7f9-9c4d-4f38-97b4-d3db2fdbfaff"</span><span class="token punctuation">,</span>
+    <span class="token string">"https://findtreasure.app/api/v1/games/test/dd0fb20d-7079-4092-8d62-413b370a2530"</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"treasures"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"total"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+    <span class="token property">"found"</span><span class="token operator">:</span> <span class="token number">0</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<p>An a graph is a huge tree of connected nodes - hence the paths array. I deduced that a node is at minimum connected to one node and maximally connected to five nodes. </p>
+<p>Now, I have to store the <code class="language-text">paths</code> gotten from the start node and subsequent nodes and traverse it continously:</p>
+<div class="gridsome-highlight has-highlighted-lines" data-language="python"><pre style="counter-reset: linenumber 0" class="language-python line-numbers"><code class="language-python"><span class="token keyword">import</span> requests
+
+
+headers <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'gomoney'</span><span class="token punctuation">:</span> <span class="token string">'number'</span><span class="token punctuation">,</span>
+    <span class="token string">'Authorization'</span><span class="token punctuation">:</span> <span class="token string">'BEARER &lt;TOKEN>'</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">def</span> <span class="token function">FindTreasure</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    url <span class="token operator">=</span> <span class="token string">"https://findtreasure.app/api/v1/games/test/{}"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+    response <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>response<span class="token punctuation">)</span>
+
+    paths <span class="token operator">=</span> response<span class="token punctuation">[</span><span class="token string">'paths'</span><span class="token punctuation">]</span>
+    
+<span class="gridsome-highlight-code-line">    <span class="token keyword">for</span> path <span class="token keyword">in</span> Paths<span class="token punctuation">:</span></span><span class="gridsome-highlight-code-line">        FindTreasure<span class="token punctuation">(</span>path<span class="token punctuation">[</span><span class="token number">43</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token comment"># slicing because we need the node ID alone.</span></span><span class="gridsome-highlight-code-line">    </span>    <span class="token keyword">return</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<p>Well, that's basically recursion. Interestingly, some nodes point back to the start node so we enter a loop, visit an already visited node and sometimes the network disconnects. Ah. So I thought, create a set of visited nodes so we don't traverse that too:</p>
+<div class="gridsome-highlight has-highlighted-lines" data-language="python"><pre style="counter-reset: linenumber 0" class="language-python line-numbers"><code class="language-python"><span class="token keyword">import</span> requests
+
+
+headers <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'gomoney'</span><span class="token punctuation">:</span> <span class="token string">'number'</span><span class="token punctuation">,</span>
+    <span class="token string">'Authorization'</span><span class="token punctuation">:</span> <span class="token string">'BEARER &lt;TOKEN>'</span>
+<span class="token punctuation">}</span>
+
+<span class="gridsome-highlight-code-line">seen <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span>
+<span class="token keyword">def</span> <span class="token function">FindTreasure</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    seen<span class="token punctuation">.</span>add<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+    url <span class="token operator">=</span> <span class="token string">"https://findtreasure.app/api/v1/games/test/{}"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+    response <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>response<span class="token punctuation">)</span>
+
+    paths <span class="token operator">=</span> response<span class="token punctuation">[</span><span class="token string">'paths'</span><span class="token punctuation">]</span>
+
+<span class="gridsome-highlight-code-line">    <span class="token keyword">for</span> path <span class="token keyword">in</span> Paths<span class="token punctuation">:</span></span><span class="gridsome-highlight-code-line">        <span class="token keyword">if</span> path <span class="token keyword">not</span> <span class="token keyword">in</span> seen<span class="token punctuation">:</span></span><span class="gridsome-highlight-code-line">            FindTreasure<span class="token punctuation">(</span>path<span class="token punctuation">)</span></span><span class="gridsome-highlight-code-line">            seen<span class="token punctuation">.</span>add<span class="token punctuation">(</span>path<span class="token punctuation">)</span></span>        
+    
+    <span class="token keyword">return</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<p>This still doesn't work how I want it. It disconnects frequently. At this point, I schedule a usual call with Favour, we then add other features - retry handlers, multithreadings and, websocket listeners.</p>
+<h3 id="adding-a-retry-strategy"><a href="#adding-a-retry-strategy" aria-hidden="true"><span class="icon icon-link"></span></a>Adding a retry strategy.</h3>
+<p>The frequent disconnection was becoming annoying. I haven't worked with the internet modules, so I had to google what to do... </p>
+<p>Luckily, I found an article that discussed retrying on getting certain responses so I followed the approach and implemented a retry strategy:</p>
+<div class="gridsome-highlight has-highlighted-lines" data-language="python"><pre style="counter-reset: linenumber 0" class="language-python line-numbers"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="gridsome-highlight-code-line"><span class="token keyword">from</span> request<span class="token punctuation">.</span>adapters <span class="token keyword">import</span> HTTPAdapter</span><span class="gridsome-highlight-code-line"><span class="token keyword">from</span> urllib3<span class="token punctuation">.</span>util <span class="token keyword">import</span> Retry</span><span class="gridsome-highlight-code-line"></span><span class="gridsome-highlight-code-line"></span><span class="gridsome-highlight-code-line">retry_strategy <span class="token operator">=</span> Retry<span class="token punctuation">(</span></span><span class="gridsome-highlight-code-line">    total<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span>  <span class="token comment"># Increase.</span></span><span class="gridsome-highlight-code-line">    status_forcelist<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">429</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token number">502</span><span class="token punctuation">,</span> <span class="token number">503</span><span class="token punctuation">,</span> <span class="token number">504</span><span class="token punctuation">]</span><span class="token punctuation">,</span></span><span class="gridsome-highlight-code-line">    method_whitelist<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"GET"</span><span class="token punctuation">]</span><span class="token punctuation">,</span></span><span class="gridsome-highlight-code-line">    backoff_factor<span class="token operator">=</span><span class="token number">1</span></span><span class="gridsome-highlight-code-line"><span class="token punctuation">)</span></span><span class="gridsome-highlight-code-line"></span><span class="gridsome-highlight-code-line">adapter <span class="token operator">=</span> HTTPAdapter<span class="token punctuation">(</span>max_retries<span class="token operator">=</span>retry_strategy<span class="token punctuation">)</span></span><span class="gridsome-highlight-code-line">http <span class="token operator">=</span> requests<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="gridsome-highlight-code-line">http<span class="token punctuation">.</span>mount<span class="token punctuation">(</span><span class="token string">"https://"</span><span class="token punctuation">,</span> adapter<span class="token punctuation">)</span></span>
+headers <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'gomoney'</span><span class="token punctuation">:</span> <span class="token string">'number'</span><span class="token punctuation">,</span>
+    <span class="token string">'Authorization'</span><span class="token punctuation">:</span> <span class="token string">'BEARER &lt;TOKEN>'</span>
+<span class="token punctuation">}</span>
+
+seen <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">FindTreasure</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    seen<span class="token punctuation">.</span>add<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+    url <span class="token operator">=</span> <span class="token string">"https://findtreasure.app/api/v1/games/test/{}"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+<span class="gridsome-highlight-code-line">    response <span class="token operator">=</span> http<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span></span>    <span class="token keyword">print</span><span class="token punctuation">(</span>response<span class="token punctuation">)</span>
+
+    paths <span class="token operator">=</span> response<span class="token punctuation">[</span><span class="token string">'paths'</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> path <span class="token keyword">in</span> Paths<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> path <span class="token keyword">not</span> <span class="token keyword">in</span> seen<span class="token punctuation">:</span>
+            FindTreasure<span class="token punctuation">(</span>path<span class="token punctuation">)</span>
+            seen<span class="token punctuation">.</span>add<span class="token punctuation">(</span>path<span class="token punctuation">)</span>
+        
+    
+    <span class="token keyword">return</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<p>The retry strategy basically retries request when any of the response code in the <code class="language-text">status_forcelist</code> array is returned. The maximum retries is set to 1000, this can be any value. We also changed the fer request function to the one attached to the retry strategy.</p>
+<p>That fixed a major part. The code doesn't end until all the nodes have been traversed, now we need to improve the speed. Favour suggested <strong>multithreading</strong>, we did research and ended up using a <em>multiprocessing</em> library.</p>
+<p>We just did small google and tried out stuff. The first trial ran 13 nodes in a second.. It was wild! Lmao.</p>
+<p>You should read on Pooling - I'm sorry I won't be able to talk about it, honestly.</p>
+<p>We defined a worker for the pool. The worker function is the function that runs each process passed into the pool. See the highlighted lines.</p>
+<div class="gridsome-highlight has-highlighted-lines" data-language="python"><pre style="counter-reset: linenumber 0" class="language-python line-numbers"><code class="language-python"><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="gridsome-highlight-code-line"><span class="token keyword">from</span> multiprocessing<span class="token punctuation">.</span>pool <span class="token keyword">import</span> ThreadPool <span class="token keyword">as</span> Pool</span>
+<span class="gridsome-highlight-code-line"><span class="token keyword">def</span> <span class="token function">worker</span><span class="token punctuation">(</span>item<span class="token punctuation">)</span><span class="token punctuation">:</span></span><span class="gridsome-highlight-code-line">    <span class="token keyword">try</span><span class="token punctuation">:</span></span><span class="gridsome-highlight-code-line">        FindTreasure<span class="token punctuation">(</span>item<span class="token punctuation">)</span></span><span class="gridsome-highlight-code-line">    <span class="token keyword">except</span> ConnectionError<span class="token punctuation">:</span></span><span class="gridsome-highlight-code-line">        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Lobatan"</span><span class="token punctuation">)</span></span>
+
+<span class="token keyword">def</span> <span class="token function">FindTreasure</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<p>We have defined the worker function. It basically is a recursion mechanism, let's employ it in the main function. We defined a pool and <code class="language-text">pulled</code> all nodes into the worker process - logically (or whatever), we should have a minimum of 5 different processes working.. Well, the rate limit cut our wings off, lmao.</p>
+<p>The modified <code class="language-text">FindTreasure(node)</code> function is:</p>
+<div class="gridsome-highlight" data-language="py"><pre style="counter-reset: linenumber 0" class="language-py line-numbers"><code class="language-py"><span class="token keyword">def</span> <span class="token function">FindTreasure</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    seen<span class="token punctuation">.</span>add<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+    url <span class="token operator">=</span> <span class="token string">"https://findtreasure.app/api/v1/games/test/{}"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+    response <span class="token operator">=</span> http<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    nodes <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    paths <span class="token operator">=</span> response<span class="token punctuation">[</span><span class="token string">'paths'</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> path <span class="token keyword">in</span> paths<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> path <span class="token keyword">not</span> <span class="token keyword">in</span> nodes<span class="token punctuation">:</span>
+            nodes<span class="token punctuation">.</span>append<span class="token punctuation">(</span>path<span class="token punctuation">[</span><span class="token number">43</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> <span class="token string">'start'</span> <span class="token keyword">in</span> nodes<span class="token punctuation">:</span>
+        nodes<span class="token punctuation">.</span>remove<span class="token punctuation">(</span><span class="token string">'start'</span><span class="token punctuation">)</span>
+
+    nodes <span class="token operator">=</span> <span class="token punctuation">[</span>node <span class="token keyword">for</span> node <span class="token keyword">in</span> nodes <span class="token keyword">if</span> node <span class="token keyword">not</span> <span class="token keyword">in</span> seen<span class="token punctuation">]</span> <span class="token comment"># Filter nodes.</span>
+
+    pool <span class="token operator">=</span> Pool<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    pool<span class="token punctuation">.</span>imap_unordered<span class="token punctuation">(</span>worker<span class="token punctuation">,</span> nodes<span class="token punctuation">)</span>
+    pool<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    pool<span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"one path down."</span><span class="token punctuation">)</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<p>What we did above is create a new array to store the node values from the response - the loop - and then, filter it again. We then pass the nodes into the pool process on line 19. Well, this is the main addition apart from the websocket subscription to not visit nodes people have visited. I'm lazy to write on that.</p>
+<p>Next thing, we fixed the <code class="language-text">__main__</code> code block just at the end of the file:</p>
+<p>In this code block, we instructed our code to start from the last visited node if there's a connection error. Luckily, the retry strategy handles this but it won't hurt to have it there too.</p>
+<div class="gridsome-highlight" data-language="py"><pre class="language-py"><code class="language-py"><span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        FindTreasure<span class="token punctuation">(</span><span class="token string">"start"</span><span class="token punctuation">)</span>
+    <span class="token keyword">except</span> ConnectionError<span class="token punctuation">:</span>
+        last <span class="token operator">=</span> seen<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        FindTreasure<span class="token punctuation">(</span>last<span class="token punctuation">)</span>
+    <span class="token keyword">except</span> json<span class="token punctuation">.</span>decoder<span class="token punctuation">.</span>JSONDecodeError<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"shutting down gracefully."</span><span class="token punctuation">)</span></code></pre></div>
+<p>That's it, we just brainstormed and got it done. He's lazy so I have to force him, smh.</p>
+<p>The full code from the article is now:</p>
+<div class="gridsome-highlight" data-language="py"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> requests
+<span class="token keyword">from</span> request<span class="token punctuation">.</span>adapters <span class="token keyword">import</span> HTTPAdapter
+<span class="token keyword">from</span> urllib3<span class="token punctuation">.</span>util <span class="token keyword">import</span> Retry
+<span class="token keyword">from</span> multiprocessing<span class="token punctuation">.</span>pool <span class="token keyword">import</span> ThreadPool <span class="token keyword">as</span> Pool
+
+
+retry_strategy <span class="token operator">=</span> Retry<span class="token punctuation">(</span>
+    total<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span>  <span class="token comment"># Increase.</span>
+    status_forcelist<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">429</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token number">502</span><span class="token punctuation">,</span> <span class="token number">503</span><span class="token punctuation">,</span> <span class="token number">504</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    method_whitelist<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"GET"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    backoff_factor<span class="token operator">=</span><span class="token number">1</span>
+<span class="token punctuation">)</span>
+
+adapter <span class="token operator">=</span> HTTPAdapter<span class="token punctuation">(</span>max_retries<span class="token operator">=</span>retry_strategy<span class="token punctuation">)</span>
+http <span class="token operator">=</span> requests<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span>
+http<span class="token punctuation">.</span>mount<span class="token punctuation">(</span><span class="token string">"https://"</span><span class="token punctuation">,</span> adapter<span class="token punctuation">)</span>
+
+headers <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'gomoney'</span><span class="token punctuation">:</span> <span class="token string">'number'</span><span class="token punctuation">,</span>
+    <span class="token string">'Authorization'</span><span class="token punctuation">:</span> <span class="token string">'BEARER &lt;TOKEN>'</span>
+<span class="token punctuation">}</span>
+
+seen <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">worker</span><span class="token punctuation">(</span>item<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        FindTreasure<span class="token punctuation">(</span>item<span class="token punctuation">)</span>
+    <span class="token keyword">except</span> ConnectionError<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Lobatan"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">FindTreasure</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    seen<span class="token punctuation">.</span>add<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+    url <span class="token operator">=</span> <span class="token string">"https://findtreasure.app/api/v1/games/test/{}"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+    response <span class="token operator">=</span> http<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    nodes <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    paths <span class="token operator">=</span> response<span class="token punctuation">[</span><span class="token string">'paths'</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> path <span class="token keyword">in</span> paths<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> path <span class="token keyword">not</span> <span class="token keyword">in</span> nodes<span class="token punctuation">:</span>
+            nodes<span class="token punctuation">.</span>append<span class="token punctuation">(</span>path<span class="token punctuation">[</span><span class="token number">43</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> <span class="token string">'start'</span> <span class="token keyword">in</span> nodes<span class="token punctuation">:</span>
+        nodes<span class="token punctuation">.</span>remove<span class="token punctuation">(</span><span class="token string">'start'</span><span class="token punctuation">)</span>
+
+    nodes <span class="token operator">=</span> <span class="token punctuation">[</span>node <span class="token keyword">for</span> node <span class="token keyword">in</span> nodes <span class="token keyword">if</span> node <span class="token keyword">not</span> <span class="token keyword">in</span> seen<span class="token punctuation">]</span> <span class="token comment"># Filter nodes.</span>
+
+    pool <span class="token operator">=</span> Pool<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    pool<span class="token punctuation">.</span>imap_unordered<span class="token punctuation">(</span>worker<span class="token punctuation">,</span> nodes<span class="token punctuation">)</span>
+    pool<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    pool<span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"one path down."</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        FindTreasure<span class="token punctuation">(</span><span class="token string">"start"</span><span class="token punctuation">)</span>
+    <span class="token keyword">except</span> ConnectionError<span class="token punctuation">:</span>
+        last <span class="token operator">=</span> seen<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        FindTreasure<span class="token punctuation">(</span>last<span class="token punctuation">)</span>
+    <span class="token keyword">except</span> json<span class="token punctuation">.</span>decoder<span class="token punctuation">.</span>JSONDecodeError<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"shutting down gracefully."</span><span class="token punctuation">)</span></code></pre></div>
+<p>You can find the full code <a href="https://github.com/Youngestdev/treasure-hunter" target="_blank" rel="nofollow noopener noreferrer">here</a>, it covers what isn't here.</p>
+<h2 id="conclusion"><a href="#conclusion" aria-hidden="true"><span class="icon icon-link"></span></a>Conclusion</h2>
+<p>Ngl, this is one of the code I'm proud of. I mean, made money from it and haha! Let me know if something is wrong, off or missing from the article if you happen to read this, thanks.</p>
+</p><hr><div id="disqus_thread"></div></div><div class="footer"><p>
+      Check my <a href="//github.com/Youngestdev" class="link">GitHub</a></p></div></div>
+    <script src="/assets/js/app.972826c5.js" defer></script><script src="/assets/js/page--src--templates--post-vue.b31455b4.js" defer></script>
+  </body>
+</html>
