@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html data-html-server-rendered="true" lang="en" data-vue-tag="lang">
+  <head>
+    <title data-vue-tag="true">Miniature Realtime Stream - Abdul&#x27;s Musings</title><meta data-vue-tag="true" charset="utf-8"><meta data-vue-tag="true" name="generator" content="Gridsome v0.6.9"><meta data-vue-tag="true" data-key="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta data-vue-tag="true" data-key="format-detection" name="format-detection" content="telephone=no"><meta data-vue-tag="true" data-key="description" name="description" content="A simple blog to pen my findings and idk idk."><meta data-vue-tag="true" name="google-site-verification" content="sIbGxCmGnUobPKM6wa8WJZaHqfW7XJZP6WUEDaIo90o"><meta data-vue-tag="true" name="description" content><meta data-vue-tag="true" name="twitter:card" content="summary"><meta data-vue-tag="true" name="twitter:creator" content="@kvng_zeez"><meta data-vue-tag="true" name="twitter:description" content><meta data-vue-tag="true" name="twitter:image" content=""><meta data-vue-tag="true" name="twitter:site" content="@kvng_zeez"><meta data-vue-tag="true" property="og:type" content="article"><meta data-vue-tag="true" property="og:title" content="Miniature Realtime Stream"><meta data-vue-tag="true" property="og:description" content><meta data-vue-tag="true" property="og:url" content="undefinedundefined"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Stylish&amp;display=swap"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans&amp;display=swap"><link data-vue-tag="true" rel="favicon" href="https://res.cloudinary.com/adeshina/image/upload/v1597158363/x8kh4xqni1ktuc4mb3v7.ico"><script data-vue-tag="true" src="https://platform.twitter.com/widgets.js" async="true"></script><noscript data-vue-tag="true" ><style>.g-image--loading{display:none;}</style></noscript><link rel="preload" href="/assets/css/0.styles.c31b00c3.css" as="style"><link rel="preload" href="/assets/js/app.cfca3445.js" as="script"><link rel="preload" href="/assets/js/page--src--templates--post-vue.a02313ea.js" as="script"><link rel="prefetch" href="/assets/js/page--node-modules--gridsome--app--pages--404-vue.c976386a.js"><link rel="prefetch" href="/assets/js/page--src--pages--index-vue.cc2794a6.js"><link rel="prefetch" href="/assets/js/vendors~page--src--templates--post-vue.52a6764f.js"><link rel="stylesheet" href="/assets/css/0.styles.c31b00c3.css">
+  </head>
+  <body data-vue-tag="">
+    <div data-server-rendered="true" id="app" class="layout"><br><a id="go-back" aria-label="Go back" class="link">← Go Back</a><div class="post-title"><h1>Miniature Realtime Stream</h1><p class="post-date"> 23 March 2025 | 5 min read</p></div><!----><div class="post-content"><p><p>Building Mercury has been fun. I have learned more about software development and MongoDB in particular. For instance, I
+had never had to make use of MongoDB aggregations until Mercury, and it has been fascinating.</p>
+<p>This little article is just to talk about MongoDB's <code class="language-text">.watch()</code>. In a few words, what the method does is to <em>watch</em> the
+changes going on in and around a collection. For example, it can log the streams of insert, update, and delete
+operations happening to the selected collection.</p>
+<h2 id="okay-what-was-i-building"><a href="#okay-what-was-i-building" aria-hidden="true"><span class="icon icon-link"></span></a>Okay, what was I building?</h2>
+<p>So, I wanted to stream the changes going on in the database and communicate it via a websocket channel to the frontend
+guys. There's an activity tab that should update the user on changes especially as the application is a
+multi-user-tied-to-one-account application.</p>
+<h2 id="so"><a href="#so" aria-hidden="true"><span class="icon icon-link"></span></a>So...</h2>
+<p>I started by building out the websocket connection manager:</p>
+<div class="gridsome-highlight" data-language="py3"><pre class="language-py3"><code class="language-py3">import asyncio
+
+from fastapi import WebSocket
+from typing import Dict
+from mercury.infra.logger import logger
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Dict[str, WebSocket] = {}
+        self.lock = asyncio.Lock()
+
+    async def connect(self, user_id: str, websocket: WebSocket):
+        await websocket.accept()
+        async with self.lock:
+            self.active_connections[user_id] = websocket
+        logger.info(f&quot;Client {user_id} connected. Active connections: {list(self.active_connections.keys())}&quot;)
+
+    async def disconnect(self, user_id: str):
+        async with self.lock:
+            if user_id in self.active_connections:
+                del self.active_connections[user_id]
+        logger.info(f&quot;Client {user_id} disconnected. Active connections: {list(self.active_connections.keys())}&quot;)
+
+    async def send_to_client(self, user_id: str, message: str):
+        async with self.lock:
+            if user_id in self.active_connections:
+                websocket = self.active_connections[user_id]
+                await websocket.send_text(message)
+                logger.info(f&quot;Message sent to client {user_id}&quot;)
+            else:
+                logger.info(f&quot;No active connection found for user {user_id}&quot;)</code></pre></div>
+<p>It's pretty straightforward. It handles the connection, keeping track and sending back to the designated users.</p>
+<p>Then, the main action - the websocket route. For changes to be listened to, a connection needs to be established for a
+user. I'm not going to go deep at all, I'm just going to illustrate it. Pardon me, these days, I have become lazy.</p>
+<p>Let's go however. I started by connecting a valid user aka storing the user's credential for subsequent communication:</p>
+<div class="gridsome-highlight" data-language="py3"><pre class="language-py3"><code class="language-py3">if not client_id and not token:
+        await websocket.close(code=1008, reason=&quot;Client ID and token required&quot;)
+        return
+
+    if app.get_client_type_from_client_id(client_id) is None:
+        await websocket.close(code=1000, reason=&quot;Invalid client ID&quot;)
+
+    user = app.authentication_service.decode_jwt(
+        token
+    )
+
+    db = await app.database.get_db()
+
+    valid_user = await db.users.find_one({
+        &quot;email&quot;: user[&quot;user_id&quot;]
+    })
+
+    if valid_user is None:
+        await websocket.close(code=1000, reason=&quot;User does not exist&quot;)
+        return
+
+    await app.websocket.connect(str(valid_user[&quot;_id&quot;]), websocket)</code></pre></div>
+<p>First, I try to ascertain the validity of the client's ID, token and user before proceeding to connect the user, I make
+use of the ID as it's unique for each of them.</p>
+<h2 id="let-the-watch-party-begin"><a href="#let-the-watch-party-begin" aria-hidden="true"><span class="icon icon-link"></span></a>Let the watch party begin</h2>
+<p>In a <code class="language-text">try..except</code> block, I start the main party. I need to be up to date with all the operations but I don't need all
+the information being passed around as well. Therefore, I wrote an aggregation pipeline to return just the fields I'm
+interested in:</p>
+<div class="gridsome-highlight" data-language="py3"><pre class="language-py3"><code class="language-py3">pipeline = [
+    {&#39;$match&#39;: {&#39;operationType&#39;: {&#39;$in&#39;: [&#39;insert&#39;, &#39;update&#39;, &#39;delete&#39;]}}},
+    {&quot;$project&quot;: {
+        &quot;operationType&quot;: 1,
+        &quot;documentKey&quot;: 1,
+        &quot;ns&quot;: 1,
+        &quot;fullDocument.creator_id&quot;: 1,
+        &quot;fullDocument.owner._id&quot;: 1,
+        &quot;fullDocument.owned_by&quot;: 1,
+        &quot;fullDocument.quantity_in_stock&quot;: 1,
+        &quot;fullDocument.reorder_point&quot;: 1,
+        &quot;fullDocumentBeforeChange.owned_by&quot;: 1,
+        &quot;fullDocumentBeforeChange.creator_id&quot;: 1
+    }}
+]</code></pre></div>
+<p>In some cases, I need the full document before a change is effected. An example is a delete operation where I need to
+get the document details to update the stream. I defined them in an options dict:</p>
+<div class="gridsome-highlight" data-language="py3"><pre class="language-py3"><code class="language-py3">options = {
+			&#39;full_document&#39;: &#39;updateLookup&#39;,
+			&#39;full_document_before_change&#39;: &#39;required&#39;
+}</code></pre></div>
+<p>Then I begin the watch operation and store the operation type <code class="language-text">operation_type</code>, document key (ID) <code class="language-text">document_key</code>, and
+the collection <code class="language-text">collection</code>:</p>
+<div class="gridsome-highlight" data-language="py3"><pre class="language-py3"><code class="language-py3">async with db.watch(pipeline, **options) as change_stream:
+    async for change in change_stream:
+        operation_type = change[&#39;operationType&#39;]
+        document_key = change[&#39;documentKey&#39;][&quot;_id&quot;]
+        collection = change[&quot;ns&quot;][&quot;coll&quot;]</code></pre></div>
+<p>With all these in place, I defined the specific actions to be carried out (mainly websocket broadcast) for each action.
+Here's the one for the <code class="language-text">delete</code> operation:</p>
+<div class="gridsome-highlight" data-language="py3"><pre class="language-py3"><code class="language-py3">        if operation_type == &#39;delete&#39;:
+            full_doc = change.get(&#39;fullDocumentBeforeChange&#39;, {})
+
+            match collection:
+                case &quot;inventory_items&quot;:
+                    business = await db.businesses.find_one({
+                        &quot;_id&quot;: full_doc.get(&quot;owned_by&quot;)
+                    })
+                    recipient = business[&quot;owner&quot;].id if business else None
+                case &quot;orders&quot;:
+                    business = await db.businesses.find_one({
+                        &quot;_id&quot;: full_doc.get(&quot;creator_id&quot;)
+                    })
+                    recipient = business[&quot;owner&quot;].id if business else None
+                case _:
+                    logger.info(f&quot;Unhandled collection for delete: {collection}&quot;)
+                    recipient = None
+
+            if recipient:
+                message = f&quot;Change detected: {operation_type} on document {document_key} in collection {collection}&quot;
+                logger.info(f&quot;Attempting to send message to recipient: {recipient}&quot;)
+                await app.websocket.send_to_client(str(recipient), message)
+            else:
+                logger.info(f&quot;No recipient found for change: {operation_type} in {collection}&quot;)</code></pre></div>
+<p>The action for <code class="language-text">insert</code> and <code class="language-text">update</code> are similar si they're grouped togehter:</p>
+<div class="gridsome-highlight" data-language="py3"><pre class="language-py3"><code class="language-py3">        elif operation_type in [&#39;insert&#39;, &#39;update&#39;]:
+            full_doc = change.get(&#39;fullDocument&#39;, {})
+
+            match collection:
+                case &quot;orders&quot;:
+                    business = await db.businesses.find_one({
+                        &quot;_id&quot;: full_doc.get(&quot;creator_id&quot;)
+                    }, {&quot;owner&quot;: 1})
+                    recipient = business[&quot;owner&quot;].id if business else None
+                case &quot;inventory_items&quot;:
+                    business = await db.businesses.find_one({
+                        &quot;_id&quot;: full_doc.get(&quot;owned_by&quot;)
+                    }, {&quot;owner&quot;: 1})
+                    recipient = business[&quot;owner&quot;].id if business else None
+
+                    if full_doc.get(&quot;quantity_in_stock&quot;) &lt;= full_doc.get(&quot;reorder_point&quot;):
+                        await app.websocket.send_to_client(str(recipient),
+                                                           &quot;Stock low, please restock the inventory to continue issuing orders.&quot;)
+
+                case _:
+                    logger.info(f&quot;Unhandled collection for {operation_type}: {collection}&quot;)
+                    recipient = None
+
+            if recipient:
+                message = f&quot;Change detected: {operation_type} on document {document_key} in collection {collection}&quot;
+                logger.info(f&quot;Attempting to send message to recipient: {recipient}&quot;)
+                await app.websocket.send_to_client(str(recipient), message)
+            else:
+                logger.info(f&quot;No recipient found for change: {operation_type} in {collection}&quot;)
+
+        else:
+            logger.info(f&quot;Unhandled operation type: {operation_type}&quot;)</code></pre></div>
+<p>The end:</p>
+<div class="gridsome-highlight" data-language="py3"><pre class="language-py3"><code class="language-py3">except asyncio.CancelledError:
+        # Handle cancellation gracefully
+        logger.info(&quot;Task was cancelled. Cleaning up...&quot;)
+    except WebSocketDisconnect:
+        await app.websocket.disconnect(str(valid_user[&quot;_id&quot;]))
+        logger.info(f&quot;User {valid_user[&quot;_id&quot;]} is disconnected&quot;)</code></pre></div>
+<p>I connected an active session:</p>
+<div class="gridsome-highlight" data-language="console"><pre class="language-console"><code class="language-console">Client 67a9f47786c624adede7---- connected. Active connections: [&#39;67a9f47786c624adede7----&#39;]</code></pre></div>
+<div class="gridsome-highlight" data-language="console"><pre class="language-console"><code class="language-console">Change detected: delete on document 67aa00fce173bf9d4ba2---- in collection orders</code></pre></div>
+<h2 id="if-you-were"><a href="#if-you-were" aria-hidden="true"><span class="icon icon-link"></span></a>If you were...</h2>
+<p>If you were to build a streaming endpoint like this, how would you approach it?</p>
+</p><hr><div id="disqus_thread"></div></div><div class="footer"><p>
+      Check my <a href="//github.com/Youngestdev" class="link">GitHub</a></p></div></div>
+    <script>window.__INITIAL_STATE__={"data":{"post":{"id":"44e5235b2350db14fe3aff6a21ea318d","title":"Miniature Realtime Stream","content":"\u003Cp\u003EBuilding Mercury has been fun. I have learned more about software development and MongoDB in particular. For instance, I\nhad never had to make use of MongoDB aggregations until Mercury, and it has been fascinating.\u003C\u002Fp\u003E\n\u003Cp\u003EThis little article is just to talk about MongoDB's \u003Ccode class=\"language-text\"\u003E.watch()\u003C\u002Fcode\u003E. In a few words, what the method does is to \u003Cem\u003Ewatch\u003C\u002Fem\u003E the\nchanges going on in and around a collection. For example, it can log the streams of insert, update, and delete\noperations happening to the selected collection.\u003C\u002Fp\u003E\n\u003Ch2 id=\"okay-what-was-i-building\"\u003E\u003Ca href=\"#okay-what-was-i-building\" aria-hidden=\"true\"\u003E\u003Cspan class=\"icon icon-link\"\u003E\u003C\u002Fspan\u003E\u003C\u002Fa\u003EOkay, what was I building?\u003C\u002Fh2\u003E\n\u003Cp\u003ESo, I wanted to stream the changes going on in the database and communicate it via a websocket channel to the frontend\nguys. There's an activity tab that should update the user on changes especially as the application is a\nmulti-user-tied-to-one-account application.\u003C\u002Fp\u003E\n\u003Ch2 id=\"so\"\u003E\u003Ca href=\"#so\" aria-hidden=\"true\"\u003E\u003Cspan class=\"icon icon-link\"\u003E\u003C\u002Fspan\u003E\u003C\u002Fa\u003ESo...\u003C\u002Fh2\u003E\n\u003Cp\u003EI started by building out the websocket connection manager:\u003C\u002Fp\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"py3\"\u003E\u003Cpre class=\"language-py3\"\u003E\u003Ccode class=\"language-py3\"\u003Eimport asyncio\n\nfrom fastapi import WebSocket\nfrom typing import Dict\nfrom mercury.infra.logger import logger\n\n\nclass ConnectionManager:\n    def __init__(self):\n        self.active_connections: Dict[str, WebSocket] = {}\n        self.lock = asyncio.Lock()\n\n    async def connect(self, user_id: str, websocket: WebSocket):\n        await websocket.accept()\n        async with self.lock:\n            self.active_connections[user_id] = websocket\n        logger.info(f&quot;Client {user_id} connected. Active connections: {list(self.active_connections.keys())}&quot;)\n\n    async def disconnect(self, user_id: str):\n        async with self.lock:\n            if user_id in self.active_connections:\n                del self.active_connections[user_id]\n        logger.info(f&quot;Client {user_id} disconnected. Active connections: {list(self.active_connections.keys())}&quot;)\n\n    async def send_to_client(self, user_id: str, message: str):\n        async with self.lock:\n            if user_id in self.active_connections:\n                websocket = self.active_connections[user_id]\n                await websocket.send_text(message)\n                logger.info(f&quot;Message sent to client {user_id}&quot;)\n            else:\n                logger.info(f&quot;No active connection found for user {user_id}&quot;)\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Cp\u003EIt's pretty straightforward. It handles the connection, keeping track and sending back to the designated users.\u003C\u002Fp\u003E\n\u003Cp\u003EThen, the main action - the websocket route. For changes to be listened to, a connection needs to be established for a\nuser. I'm not going to go deep at all, I'm just going to illustrate it. Pardon me, these days, I have become lazy.\u003C\u002Fp\u003E\n\u003Cp\u003ELet's go however. I started by connecting a valid user aka storing the user's credential for subsequent communication:\u003C\u002Fp\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"py3\"\u003E\u003Cpre class=\"language-py3\"\u003E\u003Ccode class=\"language-py3\"\u003Eif not client_id and not token:\n        await websocket.close(code=1008, reason=&quot;Client ID and token required&quot;)\n        return\n\n    if app.get_client_type_from_client_id(client_id) is None:\n        await websocket.close(code=1000, reason=&quot;Invalid client ID&quot;)\n\n    user = app.authentication_service.decode_jwt(\n        token\n    )\n\n    db = await app.database.get_db()\n\n    valid_user = await db.users.find_one({\n        &quot;email&quot;: user[&quot;user_id&quot;]\n    })\n\n    if valid_user is None:\n        await websocket.close(code=1000, reason=&quot;User does not exist&quot;)\n        return\n\n    await app.websocket.connect(str(valid_user[&quot;_id&quot;]), websocket)\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Cp\u003EFirst, I try to ascertain the validity of the client's ID, token and user before proceeding to connect the user, I make\nuse of the ID as it's unique for each of them.\u003C\u002Fp\u003E\n\u003Ch2 id=\"let-the-watch-party-begin\"\u003E\u003Ca href=\"#let-the-watch-party-begin\" aria-hidden=\"true\"\u003E\u003Cspan class=\"icon icon-link\"\u003E\u003C\u002Fspan\u003E\u003C\u002Fa\u003ELet the watch party begin\u003C\u002Fh2\u003E\n\u003Cp\u003EIn a \u003Ccode class=\"language-text\"\u003Etry..except\u003C\u002Fcode\u003E block, I start the main party. I need to be up to date with all the operations but I don't need all\nthe information being passed around as well. Therefore, I wrote an aggregation pipeline to return just the fields I'm\ninterested in:\u003C\u002Fp\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"py3\"\u003E\u003Cpre class=\"language-py3\"\u003E\u003Ccode class=\"language-py3\"\u003Epipeline = [\n    {&#39;$match&#39;: {&#39;operationType&#39;: {&#39;$in&#39;: [&#39;insert&#39;, &#39;update&#39;, &#39;delete&#39;]}}},\n    {&quot;$project&quot;: {\n        &quot;operationType&quot;: 1,\n        &quot;documentKey&quot;: 1,\n        &quot;ns&quot;: 1,\n        &quot;fullDocument.creator_id&quot;: 1,\n        &quot;fullDocument.owner._id&quot;: 1,\n        &quot;fullDocument.owned_by&quot;: 1,\n        &quot;fullDocument.quantity_in_stock&quot;: 1,\n        &quot;fullDocument.reorder_point&quot;: 1,\n        &quot;fullDocumentBeforeChange.owned_by&quot;: 1,\n        &quot;fullDocumentBeforeChange.creator_id&quot;: 1\n    }}\n]\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Cp\u003EIn some cases, I need the full document before a change is effected. An example is a delete operation where I need to\nget the document details to update the stream. I defined them in an options dict:\u003C\u002Fp\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"py3\"\u003E\u003Cpre class=\"language-py3\"\u003E\u003Ccode class=\"language-py3\"\u003Eoptions = {\n\t\t\t&#39;full_document&#39;: &#39;updateLookup&#39;,\n\t\t\t&#39;full_document_before_change&#39;: &#39;required&#39;\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Cp\u003EThen I begin the watch operation and store the operation type \u003Ccode class=\"language-text\"\u003Eoperation_type\u003C\u002Fcode\u003E, document key (ID) \u003Ccode class=\"language-text\"\u003Edocument_key\u003C\u002Fcode\u003E, and\nthe collection \u003Ccode class=\"language-text\"\u003Ecollection\u003C\u002Fcode\u003E:\u003C\u002Fp\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"py3\"\u003E\u003Cpre class=\"language-py3\"\u003E\u003Ccode class=\"language-py3\"\u003Easync with db.watch(pipeline, **options) as change_stream:\n    async for change in change_stream:\n        operation_type = change[&#39;operationType&#39;]\n        document_key = change[&#39;documentKey&#39;][&quot;_id&quot;]\n        collection = change[&quot;ns&quot;][&quot;coll&quot;]\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Cp\u003EWith all these in place, I defined the specific actions to be carried out (mainly websocket broadcast) for each action.\nHere's the one for the \u003Ccode class=\"language-text\"\u003Edelete\u003C\u002Fcode\u003E operation:\u003C\u002Fp\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"py3\"\u003E\u003Cpre class=\"language-py3\"\u003E\u003Ccode class=\"language-py3\"\u003E        if operation_type == &#39;delete&#39;:\n            full_doc = change.get(&#39;fullDocumentBeforeChange&#39;, {})\n\n            match collection:\n                case &quot;inventory_items&quot;:\n                    business = await db.businesses.find_one({\n                        &quot;_id&quot;: full_doc.get(&quot;owned_by&quot;)\n                    })\n                    recipient = business[&quot;owner&quot;].id if business else None\n                case &quot;orders&quot;:\n                    business = await db.businesses.find_one({\n                        &quot;_id&quot;: full_doc.get(&quot;creator_id&quot;)\n                    })\n                    recipient = business[&quot;owner&quot;].id if business else None\n                case _:\n                    logger.info(f&quot;Unhandled collection for delete: {collection}&quot;)\n                    recipient = None\n\n            if recipient:\n                message = f&quot;Change detected: {operation_type} on document {document_key} in collection {collection}&quot;\n                logger.info(f&quot;Attempting to send message to recipient: {recipient}&quot;)\n                await app.websocket.send_to_client(str(recipient), message)\n            else:\n                logger.info(f&quot;No recipient found for change: {operation_type} in {collection}&quot;)\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Cp\u003EThe action for \u003Ccode class=\"language-text\"\u003Einsert\u003C\u002Fcode\u003E and \u003Ccode class=\"language-text\"\u003Eupdate\u003C\u002Fcode\u003E are similar si they're grouped togehter:\u003C\u002Fp\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"py3\"\u003E\u003Cpre class=\"language-py3\"\u003E\u003Ccode class=\"language-py3\"\u003E        elif operation_type in [&#39;insert&#39;, &#39;update&#39;]:\n            full_doc = change.get(&#39;fullDocument&#39;, {})\n\n            match collection:\n                case &quot;orders&quot;:\n                    business = await db.businesses.find_one({\n                        &quot;_id&quot;: full_doc.get(&quot;creator_id&quot;)\n                    }, {&quot;owner&quot;: 1})\n                    recipient = business[&quot;owner&quot;].id if business else None\n                case &quot;inventory_items&quot;:\n                    business = await db.businesses.find_one({\n                        &quot;_id&quot;: full_doc.get(&quot;owned_by&quot;)\n                    }, {&quot;owner&quot;: 1})\n                    recipient = business[&quot;owner&quot;].id if business else None\n\n                    if full_doc.get(&quot;quantity_in_stock&quot;) &lt;= full_doc.get(&quot;reorder_point&quot;):\n                        await app.websocket.send_to_client(str(recipient),\n                                                           &quot;Stock low, please restock the inventory to continue issuing orders.&quot;)\n\n                case _:\n                    logger.info(f&quot;Unhandled collection for {operation_type}: {collection}&quot;)\n                    recipient = None\n\n            if recipient:\n                message = f&quot;Change detected: {operation_type} on document {document_key} in collection {collection}&quot;\n                logger.info(f&quot;Attempting to send message to recipient: {recipient}&quot;)\n                await app.websocket.send_to_client(str(recipient), message)\n            else:\n                logger.info(f&quot;No recipient found for change: {operation_type} in {collection}&quot;)\n\n        else:\n            logger.info(f&quot;Unhandled operation type: {operation_type}&quot;)\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Cp\u003EThe end:\u003C\u002Fp\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"py3\"\u003E\u003Cpre class=\"language-py3\"\u003E\u003Ccode class=\"language-py3\"\u003Eexcept asyncio.CancelledError:\n        # Handle cancellation gracefully\n        logger.info(&quot;Task was cancelled. Cleaning up...&quot;)\n    except WebSocketDisconnect:\n        await app.websocket.disconnect(str(valid_user[&quot;_id&quot;]))\n        logger.info(f&quot;User {valid_user[&quot;_id&quot;]} is disconnected&quot;)\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Cp\u003EI connected an active session:\u003C\u002Fp\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"console\"\u003E\u003Cpre class=\"language-console\"\u003E\u003Ccode class=\"language-console\"\u003EClient 67a9f47786c624adede7---- connected. Active connections: [&#39;67a9f47786c624adede7----&#39;]\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Cdiv class=\"gridsome-highlight\" data-language=\"console\"\u003E\u003Cpre class=\"language-console\"\u003E\u003Ccode class=\"language-console\"\u003EChange detected: delete on document 67aa00fce173bf9d4ba2---- in collection orders\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003C\u002Fdiv\u003E\n\u003Ch2 id=\"if-you-were\"\u003E\u003Ca href=\"#if-you-were\" aria-hidden=\"true\"\u003E\u003Cspan class=\"icon icon-link\"\u003E\u003C\u002Fspan\u003E\u003C\u002Fa\u003EIf you were...\u003C\u002Fh2\u003E\n\u003Cp\u003EIf you were to build a streaming endpoint like this, how would you approach it?\u003C\u002Fp\u003E\n","date":"23 March 2025","timeToRead":5,"image":null}},"context":{}};(function(){var s;(s=document.currentScript||document.scripts[document.scripts.length-1]).parentNode.removeChild(s);}());</script><script src="/assets/js/app.cfca3445.js" defer></script><script src="/assets/js/page--src--templates--post-vue.a02313ea.js" defer></script>
+  </body>
+</html>
