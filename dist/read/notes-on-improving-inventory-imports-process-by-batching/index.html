@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html data-html-server-rendered="true" lang="en" data-vue-tag="lang">
+  <head>
+    <title data-vue-tag="true">Notes On Improving Inventory Imports Process By Batching - Abdul&#x27;s Musings</title><meta data-vue-tag="true" charset="utf-8"><meta data-vue-tag="true" name="generator" content="Gridsome v0.6.9"><meta data-vue-tag="true" data-key="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta data-vue-tag="true" data-key="format-detection" name="format-detection" content="telephone=no"><meta data-vue-tag="true" data-key="description" name="description" content="A simple blog to pen my findings and idk idk."><meta data-vue-tag="true" name="google-site-verification" content="sIbGxCmGnUobPKM6wa8WJZaHqfW7XJZP6WUEDaIo90o"><meta data-vue-tag="true" name="description" content><meta data-vue-tag="true" name="twitter:card" content="summary"><meta data-vue-tag="true" name="twitter:creator" content="@kvng_zeez"><meta data-vue-tag="true" name="twitter:description" content><meta data-vue-tag="true" name="twitter:image" content=""><meta data-vue-tag="true" name="twitter:site" content="@kvng_zeez"><meta data-vue-tag="true" property="og:type" content="article"><meta data-vue-tag="true" property="og:title" content="Notes On Improving Inventory Imports Process By Batching"><meta data-vue-tag="true" property="og:description" content><meta data-vue-tag="true" property="og:url" content="undefinedundefined"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Stylish&amp;display=swap"><link data-vue-tag="true" rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans&amp;display=swap"><link data-vue-tag="true" rel="favicon" href="https://res.cloudinary.com/adeshina/image/upload/v1597158363/x8kh4xqni1ktuc4mb3v7.ico"><script data-vue-tag="true" src="https://platform.twitter.com/widgets.js" async="true"></script><noscript data-vue-tag="true" ><style>.g-image--loading{display:none;}</style></noscript><link rel="preload" href="/assets/css/0.styles.c31b00c3.css" as="style"><link rel="preload" href="/assets/js/app.49943ab9.js" as="script"><link rel="preload" href="/assets/js/page--src--templates--post-vue.67d5f911.js" as="script"><link rel="prefetch" href="/assets/js/page--node-modules--gridsome--app--pages--404-vue.c976386a.js"><link rel="prefetch" href="/assets/js/page--src--pages--index-vue.ba2425b9.js"><link rel="prefetch" href="/assets/js/vendors~page--src--templates--post-vue.52a6764f.js"><link rel="stylesheet" href="/assets/css/0.styles.c31b00c3.css">
+  </head>
+  <body data-vue-tag="">
+    <div data-server-rendered="true" id="app" class="layout"><br><a id="go-back" aria-label="Go back" class="link">← Go Back</a><div class="post-title"><h1>Notes On Improving Inventory Imports Process By Batching</h1><p class="post-date"> 19 September 2025 | 11 min read</p></div><!----><div class="post-content"><p><blockquote>
+<p>Check out Mercury, a business operations management application on <a href="https://usemercury.app" target="_blank" rel="nofollow noopener noreferrer">https://usemercury.app</a>.</p>
+</blockquote>
+<h2 id="scenrario"><a href="#scenrario" aria-hidden="true"><span class="icon icon-link"></span></a>Scenrario</h2>
+<p>A large retailer with 50,000 SKUs decides to migrate their inventory to <a href="https://usemercury.app" target="_blank" rel="nofollow noopener noreferrer">Mercury</a>. They upload their carefully prepared CSV file, watch the progress bar crawl to 99%, and then... <strong>crash</strong>. The entire import fails with an unhelpful <code class="language-text">500 Internal Server Error</code>. Hours of work, gone.</p>
+<blockquote>
+<p>The first few iterations of the import inventory failed woefully.</p>
+</blockquote>
+<h2 id="the-hidden-complexities"><a href="#the-hidden-complexities" aria-hidden="true"><span class="icon icon-link"></span></a>The Hidden Complexities</h2>
+<p><strong>Data Integrity Challenges:</strong></p>
+<ul>
+<li>Handling malformed data, encoding issues, and schema mismatches</li>
+<li>Preventing duplicate SKUs within the same upload</li>
+<li>Avoiding conflicts with existing inventory items</li>
+<li>Managing referential integrity across categories and business boundaries</li>
+</ul>
+<p><strong>Performance Bottlenecks:</strong></p>
+<ul>
+<li>The infamous <code class="language-text">N+1</code> query problem (one query per row = death)</li>
+<li>Memory exhaustion with large files</li>
+<li>Database connection pool saturation</li>
+<li>Lock contention during concurrent imports</li>
+</ul>
+<p><strong>Concurrency Nightmares:</strong></p>
+<ul>
+<li>Multiple users uploading simultaneously</li>
+<li>Race conditions between SKU generation and insertion</li>
+<li>Partial failures requiring complex rollback logic</li>
+<li>Maintaining ACID properties across thousands of operations</li>
+</ul>
+<h2 id="system-architecture-a-multi-stage-pipeline"><a href="#system-architecture-a-multi-stage-pipeline" aria-hidden="true"><span class="icon icon-link"></span></a>System Architecture: A Multi-Stage Pipeline</h2>
+<p>My solution is a sophisticated pipeline that isolates concerns, maximizes parallelism, and provides multiple layers of resilience. Built on <strong>FastAPI</strong> and <strong>Beanie ODM</strong> (asyncio-native MongoDB ODM), the system processes files through distinct, optimized stages.</p>
+<img width="1152" height="1097" alt="image" src="https://gist.github.com/user-attachments/assets/494ba03a-6c44-4706-8ec7-27b9f8c965f5" />
+<h3 id="key-architectural-principles"><a href="#key-architectural-principles" aria-hidden="true"><span class="icon icon-link"></span></a>Key Architectural Principles</h3>
+<ol>
+<li><strong>Asynchronous by Design</strong>: Every I/O operation is non-blocking, enabling high concurrency</li>
+<li><strong>Batch Everything</strong>: Transform O(N) operations into O(1) or O(log N) operations</li>
+<li><strong>Fail Fast, Recover Smart</strong>: Validate early, but handle failures gracefully</li>
+<li><strong>Isolation of Concerns</strong>: Each stage has a single responsibility and clear interfaces</li>
+<li><strong>Observable and Debuggable</strong>: Comprehensive logging and metrics at every stage</li>
+</ol>
+<h2 id="intelligent-file-processing-and-parsing"><a href="#intelligent-file-processing-and-parsing" aria-hidden="true"><span class="icon icon-link"></span></a>Intelligent File Processing and Parsing</h2>
+<p>The first stage demonstrates that even "simple" file parsing requires sophisticated engineering when done at scale. <a href="https://usenercury.app" target="_blank" rel="nofollow noopener noreferrer">Mercury</a> supports 7 different file formats through a pluggable parser architecture:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token comment"># From mercury/utilities/inventory_utils.py</span>
+
+<span class="token keyword">def</span> <span class="token function">parse_document</span><span class="token punctuation">(</span>filename<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> content<span class="token punctuation">:</span> <span class="token builtin">bytes</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> List<span class="token punctuation">[</span>Dict<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">,</span> Any<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    Parse documents with intelligent format detection and fallback strategies.
+    Supports: CSV, Excel (XLSX/XLS), PDF, DOCX, TXT, JSON, XML
+    """</span>
+    ext <span class="token operator">=</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>splitext<span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    
+    parser_mapping <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">".csv"</span><span class="token punctuation">:</span> parse_csv<span class="token punctuation">,</span>
+        <span class="token string">".xlsx"</span><span class="token punctuation">:</span> parse_excel<span class="token punctuation">,</span> <span class="token string">".xls"</span><span class="token punctuation">:</span> parse_excel<span class="token punctuation">,</span>
+        <span class="token string">".pdf"</span><span class="token punctuation">:</span> parse_pdf<span class="token punctuation">,</span>
+        <span class="token string">".docx"</span><span class="token punctuation">:</span> parse_docx<span class="token punctuation">,</span>
+        <span class="token string">".txt"</span><span class="token punctuation">:</span> parse_txt<span class="token punctuation">,</span>
+        <span class="token string">".json"</span><span class="token punctuation">:</span> parse_json<span class="token punctuation">,</span>
+        <span class="token string">".xml"</span><span class="token punctuation">:</span> parse_xml
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">if</span> ext <span class="token keyword">in</span> parser_mapping<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> parser_mapping<span class="token punctuation">[</span>ext<span class="token punctuation">]</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token comment"># Fallback: attempt regex-based parsing</span>
+        <span class="token keyword">return</span> parse_with_regex<span class="token punctuation">(</span>content<span class="token punctuation">)</span></code></pre></div>
+<h3 id="the-excel-parser-handling-real-world-messiness"><a href="#the-excel-parser-handling-real-world-messiness" aria-hidden="true"><span class="icon icon-link"></span></a>The Excel Parser: Handling Real-World Messiness</h3>
+<p>Excel files are particularly tricky because users create them in unpredictable ways. Our parser handles common issues like:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">parse_excel</span><span class="token punctuation">(</span>content<span class="token punctuation">:</span> <span class="token builtin">bytes</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> List<span class="token punctuation">[</span>Dict<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">,</span> Any<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    Robust Excel parser handling:
+    - BOM (Byte Order Mark) characters
+    - Inconsistent header formats
+    - Empty rows and columns
+    - Auto-generated column names
+    """</span>
+    <span class="token comment"># Skip the first row (often contains formatting) and use predefined headers</span>
+    df <span class="token operator">=</span> pd<span class="token punctuation">.</span>read_excel<span class="token punctuation">(</span>BytesIO<span class="token punctuation">(</span>content<span class="token punctuation">)</span><span class="token punctuation">,</span> skiprows<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> names<span class="token operator">=</span><span class="token punctuation">[</span>
+        <span class="token string">"SKU"</span><span class="token punctuation">,</span> <span class="token string">"Name"</span><span class="token punctuation">,</span> <span class="token string">"Description"</span><span class="token punctuation">,</span> <span class="token string">"Price"</span><span class="token punctuation">,</span> <span class="token string">"Quantity In Stock"</span><span class="token punctuation">,</span>
+        <span class="token string">"Reorder Point"</span><span class="token punctuation">,</span> <span class="token string">"Reorder Quantity"</span><span class="token punctuation">,</span> <span class="token string">"Unit Of Measure"</span><span class="token punctuation">,</span> <span class="token string">"Category"</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Strip BOM characters that break column matching</span>
+    df<span class="token punctuation">.</span>columns <span class="token operator">=</span> <span class="token punctuation">[</span>col<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>lstrip<span class="token punctuation">(</span><span class="token string">'\ufeff'</span><span class="token punctuation">)</span> <span class="token keyword">for</span> col <span class="token keyword">in</span> df<span class="token punctuation">.</span>columns<span class="token punctuation">]</span>
+    
+    <span class="token keyword">return</span> df<span class="token punctuation">.</span>to_dict<span class="token punctuation">(</span>orient<span class="token operator">=</span><span class="token string">"records"</span><span class="token punctuation">)</span></code></pre></div>
+<h3 id="memory-efficient-pre-processing"><a href="#memory-efficient-pre-processing" aria-hidden="true"><span class="icon icon-link"></span></a>Memory-Efficient Pre-processing</h3>
+<p>Once parsed, we perform a critical <strong>single-pass analysis</strong> of the entire dataset. This step eliminates the need for multiple scans and sets up optimal batch operations:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token comment"># From mercury/services/inventory.py</span>
+
+<span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">load_inventory_from_file</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> user<span class="token punctuation">:</span> User<span class="token punctuation">,</span> has_sku<span class="token punctuation">:</span> <span class="token builtin">bool</span><span class="token punctuation">,</span> <span class="token builtin">file</span><span class="token punctuation">:</span> UploadFile<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment"># Parse entire file into memory (acceptable for files up to 100MB)</span>
+    inventory_list <span class="token operator">=</span> parse_document<span class="token punctuation">(</span><span class="token builtin">file</span><span class="token punctuation">.</span>filename<span class="token punctuation">,</span> <span class="token keyword">await</span> <span class="token builtin">file</span><span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    
+    <span class="token comment"># Single pass extraction - crucial optimization</span>
+    unique_categories <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    provided_skus <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    category_counts <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> row <span class="token keyword">in</span> inventory_list<span class="token punctuation">:</span>
+        <span class="token comment"># Normalize category names for consistency</span>
+        cat <span class="token operator">=</span> row<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"Category"</span><span class="token punctuation">,</span> <span class="token string">"general"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        unique_categories<span class="token punctuation">.</span>add<span class="token punctuation">(</span>cat<span class="token punctuation">)</span>
+        category_counts<span class="token punctuation">[</span>cat<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+
+        <span class="token comment"># Collect user-provided SKUs for validation</span>
+        <span class="token keyword">if</span> has_sku <span class="token keyword">and</span> row<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"SKU"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            provided_skus<span class="token punctuation">.</span>add<span class="token punctuation">(</span>row<span class="token punctuation">[</span><span class="token string">"SKU"</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre></div>
+<p>This single loop gives us complete knowledge about the import, allowing us to:</p>
+<ul>
+<li>Pre-fetch all required categories in one query</li>
+<li>Validate all SKU conflicts in one query  </li>
+<li>Pre-generate SKUs in optimal batch sizes</li>
+<li>Calculate accurate progress metrics</li>
+</ul>
+<h2 id="the-sku-collision-problem---a-tale-of-two-strategies"><a href="#the-sku-collision-problem---a-tale-of-two-strategies" aria-hidden="true"><span class="icon icon-link"></span></a>The SKU Collision Problem - A Tale of Two Strategies</h2>
+<p>This dealt with me a lot. Initially, I assumed there won't be any reoccurence with regards the SKU and it worked for the first few entries - 100, 500, 1000. As it grew, it started failing with a duplicate error with the SKU and it became frustrating. My naive solution was to do an <code class="language-text">if...else</code> but that wasn't efficient enough.</p>
+<p>Stock Keeping Units (SKUs) must be unique within a business's inventory. The <code class="language-text">has_sku</code> boolean parameter creates a strategic fork in our processing logic, each optimized for different scenarios.</p>
+<img width="978" height="1248" alt="image" src="https://gist.github.com/user-attachments/assets/b8379139-1748-4e5c-a92b-7d22de249f47" />
+    
+### Strategy 1: User-Provided SKUs - Trust but Verify
+<p>When users provide their own SKUs, we implement a <strong>fail-fast validation</strong> strategy:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token comment"># Parallel data fetching for optimal performance</span>
+<span class="token keyword">if</span> provided_skus<span class="token punctuation">:</span>
+    provided_sku_check_task <span class="token operator">=</span> InventoryItem<span class="token punctuation">.</span>find<span class="token punctuation">(</span>
+        In<span class="token punctuation">(</span>InventoryItem<span class="token punctuation">.</span>SKU<span class="token punctuation">,</span> <span class="token builtin">list</span><span class="token punctuation">(</span>provided_skus<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        InventoryItem<span class="token punctuation">.</span>owned_by <span class="token operator">==</span> user_business<span class="token punctuation">.</span><span class="token builtin">id</span>
+    <span class="token punctuation">)</span><span class="token punctuation">.</span>project<span class="token punctuation">(</span>InventoryItemProj<span class="token punctuation">)</span><span class="token punctuation">.</span>to_list<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment"># Execute multiple database operations concurrently</span>
+category_task <span class="token operator">=</span> InventoryCategory<span class="token punctuation">.</span>find<span class="token punctuation">(</span>
+    In<span class="token punctuation">(</span>InventoryCategory<span class="token punctuation">.</span>name<span class="token punctuation">,</span> <span class="token builtin">list</span><span class="token punctuation">(</span>unique_categories<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    InventoryCategory<span class="token punctuation">.</span>owned_by <span class="token operator">==</span> user_business<span class="token punctuation">.</span><span class="token builtin">id</span>
+<span class="token punctuation">)</span><span class="token punctuation">.</span>to_list<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+all_existing_skus_task <span class="token operator">=</span> InventoryItem<span class="token punctuation">.</span>find<span class="token punctuation">(</span>
+    InventoryItem<span class="token punctuation">.</span>owned_by <span class="token operator">==</span> user_business<span class="token punctuation">.</span><span class="token builtin">id</span>
+<span class="token punctuation">)</span><span class="token punctuation">.</span>project<span class="token punctuation">(</span>InventoryItemProj<span class="token punctuation">)</span><span class="token punctuation">.</span>to_list<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment"># Await all operations simultaneously</span>
+existing_categories<span class="token punctuation">,</span> all_existing_sku_docs <span class="token operator">=</span> <span class="token keyword">await</span> asyncio<span class="token punctuation">.</span>gather<span class="token punctuation">(</span>
+    category_task<span class="token punctuation">,</span> all_existing_skus_task
+<span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> provided_sku_check_task<span class="token punctuation">:</span>
+    provided_conflicts <span class="token operator">=</span> <span class="token keyword">await</span> provided_sku_check_task
+    conflicting_skus <span class="token operator">=</span> <span class="token punctuation">{</span>doc<span class="token punctuation">.</span>SKU <span class="token keyword">for</span> doc <span class="token keyword">in</span> provided_conflicts<span class="token punctuation">}</span>
+    
+    <span class="token keyword">if</span> conflicting_skus<span class="token punctuation">:</span>
+        <span class="token keyword">raise</span> HTTPException<span class="token punctuation">(</span>
+            status_code<span class="token operator">=</span><span class="token number">409</span><span class="token punctuation">,</span>
+            detail<span class="token operator">=</span><span class="token string-interpolation"><span class="token string">f"The following SKUs already exist: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">', '</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>conflicting_skus<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span>
+        <span class="token punctuation">)</span></code></pre></div>
+<h3 id="strategy-2-system-generated-skus---the-scaling-challenge"><a href="#strategy-2-system-generated-skus---the-scaling-challenge" aria-hidden="true"><span class="icon icon-link"></span></a>Strategy 2: System-Generated SKUs - The Scaling Challenge</h3>
+<p>This is where the real engineering complexity lies. Generating unique identifiers at scale requires careful orchestration to avoid the dreaded <code class="language-text">N+1</code> query problem.</p>
+<p><strong>My Initial Naive Approach (Don't Do This):</strong></p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token comment"># This will kill your database</span>
+<span class="token keyword">for</span> item <span class="token keyword">in</span> inventory_list<span class="token punctuation">:</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        candidate_sku <span class="token operator">=</span> generate_sku<span class="token punctuation">(</span>item<span class="token punctuation">.</span>category<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token keyword">await</span> check_sku_exists<span class="token punctuation">(</span>candidate_sku<span class="token punctuation">)</span><span class="token punctuation">:</span>  <span class="token comment"># N database calls!</span>
+            item<span class="token punctuation">.</span>sku <span class="token operator">=</span> candidate_sku
+            <span class="token keyword">break</span></code></pre></div>
+<p><strong>Improved Solution: Batched Pre-generation</strong></p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">_prepare_sku_batches</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> category_counts<span class="token punctuation">,</span> existing_skus<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    Pre-generate SKUs in batches with intelligent buffering.
+    Transforms O(N) database calls into O(categories) calls.
+    """</span>
+    sku_batches <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token comment"># Create concurrent generation tasks for each category</span>
+    <span class="token keyword">for</span> category<span class="token punctuation">,</span> count <span class="token keyword">in</span> category_counts<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token comment"># Buffer calculation: balance memory vs. collision risk</span>
+        buffer_size <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>count <span class="token operator">+</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">(</span>count <span class="token operator">*</span> <span class="token number">1.2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        task <span class="token operator">=</span> self<span class="token punctuation">.</span>_generate_sku_batch<span class="token punctuation">(</span>category<span class="token punctuation">,</span> buffer_size<span class="token punctuation">)</span>
+        tasks<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>category<span class="token punctuation">,</span> task<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Execute all generation tasks in parallel</span>
+    <span class="token keyword">for</span> category<span class="token punctuation">,</span> task <span class="token keyword">in</span> tasks<span class="token punctuation">:</span>
+        generated_skus <span class="token operator">=</span> <span class="token keyword">await</span> task
+        <span class="token comment"># Filter against known existing SKUs</span>
+        unique_skus <span class="token operator">=</span> <span class="token punctuation">[</span>sku <span class="token keyword">for</span> sku <span class="token keyword">in</span> generated_skus <span class="token keyword">if</span> sku <span class="token keyword">not</span> <span class="token keyword">in</span> existing_skus<span class="token punctuation">]</span>
+        sku_batches<span class="token punctuation">[</span>category<span class="token punctuation">]</span> <span class="token operator">=</span> unique_skus
+        
+    <span class="token keyword">return</span> sku_batches</code></pre></div>
+<h2 id="batched-asynchronous-sku-generation"><a href="#batched-asynchronous-sku-generation" aria-hidden="true"><span class="icon icon-link"></span></a>Batched Asynchronous SKU Generation</h2>
+<p>The heart of Mercury is the sophisticated SKU generation pipeline that can create thousands of unique identifiers with minimal database load.</p>
+<h3 id="the-generation-algorithm"><a href="#the-generation-algorithm" aria-hidden="true"><span class="icon icon-link"></span></a>The Generation Algorithm</h3>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">_generate_sku_batch</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> category<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> count<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> List<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    Generate a batch of SKUs with intelligent retry and validation.
+    
+    Performance characteristics:
+    - Time: O(count + log(existing_skus))
+    - Database queries: 1 per batch (not per SKU)
+    - Memory: O(count) 
+    """</span>
+    skus <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    attempts <span class="token operator">=</span> <span class="token number">0</span>
+    max_attempts <span class="token operator">=</span> count <span class="token operator">*</span> <span class="token number">2</span>  <span class="token comment"># Prevent infinite loops</span>
+
+    <span class="token keyword">while</span> <span class="token builtin">len</span><span class="token punctuation">(</span>skus<span class="token punctuation">)</span> <span class="token operator">&lt;</span> count <span class="token keyword">and</span> attempts <span class="token operator">&lt;</span> max_attempts<span class="token punctuation">:</span>
+        <span class="token comment"># Generate candidates in memory first</span>
+        batch_size <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">,</span> count <span class="token operator">-</span> <span class="token builtin">len</span><span class="token punctuation">(</span>skus<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        candidate_skus <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        
+        <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>batch_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token comment"># SKU format: CATG-12345 (category prefix + 5 digits)</span>
+            prefix <span class="token operator">=</span> category<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">.</span>upper<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            number <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>random<span class="token punctuation">.</span>choices<span class="token punctuation">(</span>string<span class="token punctuation">.</span>digits<span class="token punctuation">,</span> k<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            candidate_skus<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>prefix<span class="token punctuation">}</span></span><span class="token string">-</span><span class="token interpolation"><span class="token punctuation">{</span>number<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+        <span class="token comment"># Single database query to check entire batch</span>
+        existing_check <span class="token operator">=</span> <span class="token keyword">await</span> InventoryItem<span class="token punctuation">.</span>find<span class="token punctuation">(</span>
+            In<span class="token punctuation">(</span>InventoryItem<span class="token punctuation">.</span>SKU<span class="token punctuation">,</span> candidate_skus<span class="token punctuation">)</span>
+        <span class="token punctuation">)</span><span class="token punctuation">.</span>project<span class="token punctuation">(</span>InventoryItemProj<span class="token punctuation">)</span><span class="token punctuation">.</span>to_list<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+        <span class="token comment"># Filter out existing SKUs</span>
+        existing_set <span class="token operator">=</span> <span class="token punctuation">{</span>doc<span class="token punctuation">.</span>SKU <span class="token keyword">for</span> doc <span class="token keyword">in</span> existing_check<span class="token punctuation">}</span>
+        unique_skus <span class="token operator">=</span> <span class="token punctuation">[</span>sku <span class="token keyword">for</span> sku <span class="token keyword">in</span> candidate_skus <span class="token keyword">if</span> sku <span class="token keyword">not</span> <span class="token keyword">in</span> existing_set<span class="token punctuation">]</span>
+        
+        skus<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>unique_skus<span class="token punctuation">)</span>
+        attempts <span class="token operator">+=</span> batch_size
+
+    <span class="token keyword">return</span> skus</code></pre></div>
+<h3 id="handling-edge-cases-regeneration-logic"><a href="#handling-edge-cases-regeneration-logic" aria-hidden="true"><span class="icon icon-link"></span></a>Handling Edge Cases: Regeneration Logic</h3>
+<p>What happens when our initial batch doesn't generate enough unique SKUs? Mercury includes sophisticated regeneration logic:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token comment"># Check for insufficient batches and regenerate</span>
+regeneration_tasks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+<span class="token keyword">for</span> category<span class="token punctuation">,</span> count <span class="token keyword">in</span> category_counts<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    current_count <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>sku_batches<span class="token punctuation">[</span>category<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> current_count <span class="token operator">&lt;</span> count<span class="token punctuation">:</span>
+        shortage <span class="token operator">=</span> count <span class="token operator">-</span> current_count
+        <span class="token comment"># Generate extra to handle potential duplicates</span>
+        regenerate_count <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>shortage <span class="token operator">+</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">(</span>shortage <span class="token operator">*</span> <span class="token number">1.5</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        task <span class="token operator">=</span> self<span class="token punctuation">.</span>_generate_sku_batch<span class="token punctuation">(</span>category<span class="token punctuation">,</span> regenerate_count<span class="token punctuation">)</span>
+        regeneration_tasks<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>category<span class="token punctuation">,</span> shortage<span class="token punctuation">,</span> task<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment"># Process regeneration results</span>
+<span class="token keyword">for</span> category<span class="token punctuation">,</span> needed_count<span class="token punctuation">,</span> task <span class="token keyword">in</span> regeneration_tasks<span class="token punctuation">:</span>
+    additional_skus <span class="token operator">=</span> <span class="token keyword">await</span> task
+    existing_category_skus <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span>sku_batches<span class="token punctuation">[</span>category<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">|</span> existing_skus
+
+    <span class="token comment"># Add until we have enough, avoiding internal duplicates</span>
+    <span class="token keyword">for</span> sku <span class="token keyword">in</span> additional_skus<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> sku <span class="token keyword">not</span> <span class="token keyword">in</span> existing_category_skus<span class="token punctuation">:</span>
+            sku_batches<span class="token punctuation">[</span>category<span class="token punctuation">]</span><span class="token punctuation">.</span>append<span class="token punctuation">(</span>sku<span class="token punctuation">)</span>
+            existing_category_skus<span class="token punctuation">.</span>add<span class="token punctuation">(</span>sku<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>sku_batches<span class="token punctuation">[</span>category<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">>=</span> category_counts<span class="token punctuation">[</span>category<span class="token punctuation">]</span><span class="token punctuation">:</span>
+                <span class="token keyword">break</span></code></pre></div>
+<h3 id="sku-distribution-strategy"><a href="#sku-distribution-strategy" aria-hidden="true"><span class="icon icon-link"></span></a>SKU Distribution Strategy</h3>
+<p>During processing, we use a smart distribution mechanism to pull from our pre-generated batches:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">_get_next_available_sku</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> category<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> sku_batches<span class="token punctuation">:</span> Dict<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">,</span> List<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                                  sku_counters<span class="token punctuation">:</span> Dict<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> all_used_skus<span class="token punctuation">:</span> Set<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">str</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    Efficiently distribute SKUs from pre-generated batches with fallback logic.
+    """</span>
+    <span class="token comment"># Try to use pre-generated batch first</span>
+    <span class="token keyword">if</span> category <span class="token keyword">in</span> sku_batches <span class="token keyword">and</span> sku_counters<span class="token punctuation">[</span>category<span class="token punctuation">]</span> <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>sku_batches<span class="token punctuation">[</span>category<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        candidate_sku <span class="token operator">=</span> sku_batches<span class="token punctuation">[</span>category<span class="token punctuation">]</span><span class="token punctuation">[</span>sku_counters<span class="token punctuation">[</span>category<span class="token punctuation">]</span><span class="token punctuation">]</span>
+        <span class="token keyword">if</span> candidate_sku <span class="token keyword">not</span> <span class="token keyword">in</span> all_used_skus<span class="token punctuation">:</span>
+            sku_counters<span class="token punctuation">[</span>category<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+            <span class="token keyword">return</span> candidate_sku
+
+    <span class="token comment"># Fallback: generate individual SKU if batch is exhausted</span>
+    max_attempts <span class="token operator">=</span> <span class="token number">10</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>max_attempts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        candidate_sku <span class="token operator">=</span> <span class="token keyword">await</span> generate_unique_sku<span class="token punctuation">(</span>category<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> candidate_sku <span class="token keyword">not</span> <span class="token keyword">in</span> all_used_skus<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> candidate_sku
+
+    <span class="token keyword">raise</span> ValueError<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Failed to generate unique SKU for category </span><span class="token interpolation"><span class="token punctuation">{</span>category<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre></div>
+<h2 id="resilient-database-insertion-with-atomic-retry-logic"><a href="#resilient-database-insertion-with-atomic-retry-logic" aria-hidden="true"><span class="icon icon-link"></span></a>Resilient Database Insertion with Atomic Retry Logic</h2>
+<p>Even with perfect pre-generation, race conditions can still occur. Our final stage implements a sophisticated retry mechanism that handles partial failures gracefully.</p>
+<h3 id="the-challenge-race-conditions-in-distributed-systems"><a href="#the-challenge-race-conditions-in-distributed-systems" aria-hidden="true"><span class="icon icon-link"></span></a>The Challenge: Race Conditions in Distributed Systems</h3>
+<p>Consider this scenario:
+1. Process A generates SKU "SHOE-12345"
+2. Process B generates the same SKU "SHOE-12345" (due to random collision)
+3. Process A successfully inserts its item
+4. Process B attempts insertion and fails with duplicate key error</p>
+<p>Our system must handle this elegantly without losing data or corrupting state.</p>
+<h3 id="optimistic-insertion-with-intelligent-retry"><a href="#optimistic-insertion-with-intelligent-retry" aria-hidden="true"><span class="icon icon-link"></span></a>Optimistic Insertion with Intelligent Retry</h3>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">_insert_batch_with_retry</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> items_to_insert<span class="token punctuation">:</span> List<span class="token punctuation">[</span>InventoryItem<span class="token punctuation">]</span><span class="token punctuation">,</span> 
+                                   business_id<span class="token punctuation">:</span> PydanticObjectId<span class="token punctuation">,</span>
+                                   max_retries<span class="token punctuation">:</span> <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> List<span class="token punctuation">[</span>InventoryItem<span class="token punctuation">]</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    Insert batches with atomic retry logic for handling race conditions.
+    
+    Key features:
+    - Ordered=False for maximum throughput
+    - Specific error code handling (11000 = duplicate key)
+    - Partial success tracking
+    - Atomic SKU regeneration for failed items
+    """</span>
+    successful_items <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    remaining_items <span class="token operator">=</span> items_to_insert<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> attempt <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>max_retries <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> remaining_items<span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            <span class="token comment"># Attempt optimistic batch insertion</span>
+            result <span class="token operator">=</span> <span class="token keyword">await</span> InventoryItem<span class="token punctuation">.</span>insert_many<span class="token punctuation">(</span>remaining_items<span class="token punctuation">,</span> ordered<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+            
+            <span class="token comment"># Success: update item IDs and track insertions</span>
+            <span class="token keyword">for</span> item<span class="token punctuation">,</span> item_id <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>remaining_items<span class="token punctuation">,</span> result<span class="token punctuation">.</span>inserted_ids<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                item<span class="token punctuation">.</span><span class="token builtin">id</span> <span class="token operator">=</span> item_id
+                successful_items<span class="token punctuation">.</span>append<span class="token punctuation">(</span>item<span class="token punctuation">)</span>
+                
+            remaining_items <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>  <span class="token comment"># All succeeded</span>
+
+        <span class="token keyword">except</span> BulkWriteError <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            <span class="token comment"># Parse detailed error information</span>
+            write_errors <span class="token operator">=</span> e<span class="token punctuation">.</span>details<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'writeErrors'</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            inserted_count <span class="token operator">=</span> e<span class="token punctuation">.</span>details<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'nInserted'</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            
+            <span class="token comment"># Handle partial success: some items were inserted</span>
+            <span class="token keyword">if</span> inserted_count <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+                error_indices <span class="token operator">=</span> <span class="token punctuation">{</span>error<span class="token punctuation">[</span><span class="token string">'index'</span><span class="token punctuation">]</span> <span class="token keyword">for</span> error <span class="token keyword">in</span> write_errors<span class="token punctuation">}</span>
+                
+                <span class="token keyword">for</span> idx<span class="token punctuation">,</span> item <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>remaining_items<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    <span class="token keyword">if</span> idx <span class="token keyword">not</span> <span class="token keyword">in</span> error_indices <span class="token keyword">and</span> idx <span class="token operator">&lt;</span> inserted_count<span class="token punctuation">:</span>
+                        successful_items<span class="token punctuation">.</span>append<span class="token punctuation">(</span>item<span class="token punctuation">)</span>
+
+            <span class="token comment"># Isolate and handle duplicate key errors specifically</span>
+            duplicate_items <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            <span class="token keyword">for</span> error <span class="token keyword">in</span> write_errors<span class="token punctuation">:</span>
+                <span class="token keyword">if</span> error<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'code'</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">11000</span><span class="token punctuation">:</span>  <span class="token comment"># MongoDB duplicate key error</span>
+                    error_index <span class="token operator">=</span> error<span class="token punctuation">[</span><span class="token string">'index'</span><span class="token punctuation">]</span>
+                    <span class="token keyword">if</span> error_index <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>remaining_items<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                        duplicate_item <span class="token operator">=</span> remaining_items<span class="token punctuation">[</span>error_index<span class="token punctuation">]</span>
+                        duplicate_items<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>error_index<span class="token punctuation">,</span> duplicate_item<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+            <span class="token keyword">if</span> <span class="token keyword">not</span> duplicate_items<span class="token punctuation">:</span>
+                <span class="token comment"># Non-duplicate errors are not retryable</span>
+                logger<span class="token punctuation">.</span>error<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Non-duplicate bulk write error: </span><span class="token interpolation"><span class="token punctuation">{</span>e<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+                <span class="token keyword">break</span>
+
+            <span class="token comment"># Regenerate SKUs for duplicate items atomically</span>
+            new_remaining_items <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            <span class="token keyword">for</span> error_index<span class="token punctuation">,</span> item <span class="token keyword">in</span> duplicate_items<span class="token punctuation">:</span>
+                <span class="token keyword">if</span> attempt <span class="token operator">&lt;</span> max_retries<span class="token punctuation">:</span>
+                    category_name <span class="token operator">=</span> <span class="token keyword">await</span> self<span class="token punctuation">.</span>_get_category_name<span class="token punctuation">(</span>item<span class="token punctuation">.</span>category_id<span class="token punctuation">)</span>
+                    new_sku <span class="token operator">=</span> <span class="token keyword">await</span> self<span class="token punctuation">.</span>_generate_guaranteed_unique_sku<span class="token punctuation">(</span>
+                        category_name<span class="token punctuation">,</span> business_id
+                    <span class="token punctuation">)</span>
+                    item<span class="token punctuation">.</span>SKU <span class="token operator">=</span> new_sku
+                    new_remaining_items<span class="token punctuation">.</span>append<span class="token punctuation">(</span>item<span class="token punctuation">)</span>
+                    
+                    logger<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Reassigned SKU for duplicate item: </span><span class="token interpolation"><span class="token punctuation">{</span>new_sku<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+            remaining_items <span class="token operator">=</span> new_remaining_items
+
+    <span class="token keyword">return</span> successful_items</code></pre></div>
+<h3 id="guaranteed-unique-sku-generation"><a href="#guaranteed-unique-sku-generation" aria-hidden="true"><span class="icon icon-link"></span></a>Guaranteed Unique SKU Generation</h3>
+<p>When retries are needed, we use an even more robust generation method:</p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">_generate_guaranteed_unique_sku</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> category_name<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> 
+                                          business_id<span class="token punctuation">:</span> PydanticObjectId<span class="token punctuation">,</span>
+                                          max_attempts<span class="token punctuation">:</span> <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">50</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">str</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    Generate a SKU with database verification, used for conflict resolution.
+    
+    This method trades performance for absolute guarantees.
+    """</span>
+    <span class="token keyword">for</span> attempt <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>max_attempts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        candidate_sku <span class="token operator">=</span> <span class="token keyword">await</span> generate_unique_sku<span class="token punctuation">(</span>category_name<span class="token punctuation">)</span>
+
+        <span class="token comment"># Verify uniqueness with direct database check</span>
+        existing <span class="token operator">=</span> <span class="token keyword">await</span> InventoryItem<span class="token punctuation">.</span>find_one<span class="token punctuation">(</span><span class="token punctuation">{</span>
+            <span class="token string">"SKU"</span><span class="token punctuation">:</span> candidate_sku<span class="token punctuation">,</span>
+            <span class="token string">"owned_by"</span><span class="token punctuation">:</span> business_id
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> <span class="token keyword">not</span> existing<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> candidate_sku
+
+        <span class="token comment"># Add small delay to prevent thundering herd</span>
+        <span class="token keyword">if</span> attempt <span class="token operator">></span> <span class="token number">10</span><span class="token punctuation">:</span>
+            <span class="token keyword">await</span> asyncio<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span><span class="token number">0.01</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Ultimate fallback: timestamp-based uniqueness</span>
+    <span class="token keyword">import</span> time
+    fallback_sku <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token keyword">await</span> generate_unique_sku<span class="token punctuation">(</span>category_name<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">-</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">int</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">1000</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">10000</span><span class="token punctuation">}</span></span><span class="token string">"</span></span>
+    <span class="token keyword">return</span> fallback_sku</code></pre></div>
+<h3 id="key-optimizations"><a href="#key-optimizations" aria-hidden="true"><span class="icon icon-link"></span></a>Key Optimizations</h3>
+<p><strong>1. Batching Strategy</strong></p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python">BATCH_SIZE <span class="token operator">=</span> <span class="token number">200</span>  <span class="token comment"># Optimal balance of memory vs. transaction overhead</span>
+
+<span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> total_items<span class="token punctuation">,</span> BATCH_SIZE<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    batch_items <span class="token operator">=</span> inventory_list<span class="token punctuation">[</span>i<span class="token punctuation">:</span>i <span class="token operator">+</span> BATCH_SIZE<span class="token punctuation">]</span>
+    <span class="token comment"># Process batch atomically</span></code></pre></div>
+<p><strong>2. MongoDB Projection Optimization</strong></p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token comment"># Only fetch required fields to reduce network overhead</span>
+<span class="token punctuation">.</span>project<span class="token punctuation">(</span>InventoryItemProj<span class="token punctuation">)</span>  <span class="token comment"># Only SKU and ID fields</span>
+
+<span class="token comment"># Defined as:</span>
+<span class="token keyword">class</span> <span class="token class-name">InventoryItemProj</span><span class="token punctuation">(</span>BaseModel<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    SKU<span class="token punctuation">:</span> <span class="token builtin">str</span>
+    <span class="token builtin">id</span><span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>PydanticObjectId<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span></code></pre></div>
+<p><strong>3. Concurrent Database Operations</strong></p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token comment"># Execute multiple independent queries simultaneously</span>
+category_task<span class="token punctuation">,</span> sku_task<span class="token punctuation">,</span> conflict_task <span class="token operator">=</span> <span class="token keyword">await</span> asyncio<span class="token punctuation">.</span>gather<span class="token punctuation">(</span>
+    fetch_categories<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    fetch_existing_skus<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> 
+    check_conflicts<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span></code></pre></div>
+<p><strong>4. Memory Management</strong></p>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token comment"># Use generators for large datasets to prevent memory exhaustion</span>
+<span class="token keyword">def</span> <span class="token function">process_in_chunks</span><span class="token punctuation">(</span>items<span class="token punctuation">,</span> chunk_size<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>items<span class="token punctuation">)</span><span class="token punctuation">,</span> chunk_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">yield</span> items<span class="token punctuation">[</span>i<span class="token punctuation">:</span>i <span class="token operator">+</span> chunk_size<span class="token punctuation">]</span></code></pre></div>
+<h3 id="configuration-tuning"><a href="#configuration-tuning" aria-hidden="true"><span class="icon icon-link"></span></a>Configuration Tuning</h3>
+<div class="gridsome-highlight" data-language="python"><pre class="language-python"><code class="language-python"><span class="token comment"># Production configuration values</span>
+BATCH_SIZE <span class="token operator">=</span> <span class="token number">200</span>              <span class="token comment"># Balance memory vs. transaction cost</span>
+MAX_RETRIES <span class="token operator">=</span> <span class="token number">3</span>               <span class="token comment"># Prevent infinite retry loops  </span>
+SKU_BUFFER_MULTIPLIER <span class="token operator">=</span> <span class="token number">1.2</span>   <span class="token comment"># Account for collisions</span>
+MAX_FILE_SIZE <span class="token operator">=</span> <span class="token number">100_000_000</span>   <span class="token comment"># 100MB limit</span>
+SKU_GENERATION_BATCH_SIZE <span class="token operator">=</span> <span class="token number">50</span> <span class="token comment"># Optimal for MongoDB $in queries</span></code></pre></div>
+<h2 id="building-antifragile-systems"><a href="#building-antifragile-systems" aria-hidden="true"><span class="icon icon-link"></span></a>Building Antifragile Systems</h2>
+<p>We transformed a brittle, synchronous file import into a resilient, asynchronous data pipeline that handles edge cases gracefully. The key transformation metrics:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Max file size</td>
+<td>1K items</td>
+<td>100K items</td>
+<td>100x</td>
+</tr>
+<tr>
+<td>Database queries</td>
+<td>O(N)</td>
+<td>O(log N)</td>
+<td>~1000x reduction</td>
+</tr>
+<tr>
+<td>Failure recovery</td>
+<td>Manual cleanup</td>
+<td>Automatic retry</td>
+<td>Full automation</td>
+</tr>
+<tr>
+<td>Memory usage</td>
+<td>Unbounded</td>
+<td>Predictable</td>
+<td>Stable</td>
+</tr>
+<tr>
+<td>Concurrent imports</td>
+<td>Broken</td>
+<td>Supported</td>
+<td>∞ improvement</td>
+</tr>
+</tbody>
+</table>
+<h3 id="architectural-principles-that-made-the-difference"><a href="#architectural-principles-that-made-the-difference" aria-hidden="true"><span class="icon icon-link"></span></a>Architectural Principles That Made The Difference</h3>
+<p><strong>1. Async-First Design</strong>: Every I/O operation is non-blocking, enabling true concurrency and resource efficiency.</p>
+<p><strong>2. Batch Operations</strong>: Transform expensive per-item operations into efficient bulk operations.</p>
+<p><strong>3. Fail-Fast Validation</strong>: Catch problems early with meaningful error messages, before expensive processing begins.</p>
+<p><strong>4. Graceful Degradation</strong>: When things go wrong (and they will), fail partially and retry intelligently.</p>
+<p><strong>5. Observable Systems</strong>: Comprehensive logging and metrics make debugging and optimization possible.</p>
+<h2 id="conclusion--notes"><a href="#conclusion--notes" aria-hidden="true"><span class="icon icon-link"></span></a>Conclusion &#x26; Notes</h2>
+<p>Now, I wasn't particular about the processing speed but ensuring it worked. Now that it works and the collision of SKUs is eliminated, I'm exploring better ways to handle this -> handle uploads and processing in the background so users can focus on other things.</p>
+<ul>
+<li>Imports with SKUs are faster than those without. This makes sense, lesser computation required.</li>
+</ul>
+<p>Thanks to Claude, I was able to combine the scattered pieces for this implementation.</p>
+</p><hr><div id="disqus_thread"></div></div><div class="footer"><p>
+      Check my <a href="//github.com/Youngestdev" class="link">GitHub</a></p></div></div>
+    <script src="/assets/js/app.49943ab9.js" defer></script><script src="/assets/js/page--src--templates--post-vue.67d5f911.js" defer></script>
+  </body>
+</html>
